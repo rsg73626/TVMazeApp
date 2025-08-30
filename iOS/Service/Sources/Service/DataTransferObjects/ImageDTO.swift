@@ -1,17 +1,17 @@
 //
 //  File.swift
-//  Domain
+//  Service
 //
 //  Created by Renan Germano on 29/08/25.
 //
 
 import Foundation
 
-public final class Image {
-    public let medium: URL?
-    public let original: URL?
+final class ImageDTO: Decodable {
+    let medium: String?
+    let original: String?
     
-    public init(medium: URL?, original: URL?) {
+    init(medium: String?, original: String?) {
         self.medium = medium
         self.original = original
     }

@@ -9,14 +9,14 @@ import Foundation
 
 public final class Episode: Equatable {
     
-    let id: Int
-    let season: Int
-    let episode: Int
-    let name: String
-    let summary: String
-    let image: Image
+    public let id: Int
+    public let season: Int
+    public let episode: Int
+    public let name: String
+    public let summary: String
+    public let image: Image
     
-    init(id: Int, season: Int, episode: Int, name: String, summary: String, image: Image) {
+    public init(id: Int, season: Int, episode: Int, name: String, summary: String, image: Image) {
         self.id = id
         self.season = season
         self.episode = episode

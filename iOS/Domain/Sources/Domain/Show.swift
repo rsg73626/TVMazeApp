@@ -5,14 +5,14 @@ import Foundation
 
 public final class Show: Equatable {
     
-    let id: Int
-    let name: String
-    let genres: [String]
-    let summary: String
-    let year: Int?
-    let image: Image
+    public let id: Int
+    public let name: String
+    public let genres: [String]
+    public let summary: String
+    public let year: Int?
+    public let image: Image
     
-    init(id: Int, name: String, genres: [String], summary: String, year: Int?, image: Image) {
+    public init(id: Int, name: String, genres: [String], summary: String, year: Int?, image: Image) {
         self.id = id
         self.name = name
         self.genres = genres
