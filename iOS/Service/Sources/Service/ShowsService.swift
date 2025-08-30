@@ -61,7 +61,7 @@ public final class ShowsService: ShowsServicing {
     
     // MARK: - Private
     
-    private let baseUrlStr = " https://api.tvmaze.com/"
+    private let baseUrlStr = "https://api.tvmaze.com"
     
     private func urlForShows(page: UInt) -> URL {
         URL(string: baseUrlStr + "/shows?page=\(page)")!

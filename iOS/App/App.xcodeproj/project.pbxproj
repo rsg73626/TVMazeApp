@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CF54DF642E62BDA000F3DDA1 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF632E62BDA000F3DDA1 /* Domain */; };
+		CF54DF672E62BDAF00F3DDA1 /* Service in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF662E62BDAF00F3DDA1 /* Service */; };
+		CF54DF692E62BDAF00F3DDA1 /* ServiceAPI in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF682E62BDAF00F3DDA1 /* ServiceAPI */; };
+		CF54DF6C2E62BDC000F3DDA1 /* ShowsList in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF6B2E62BDC000F3DDA1 /* ShowsList */; };
+		CF54DF6E2E62BDC000F3DDA1 /* ShowsListAPI in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF6D2E62BDC000F3DDA1 /* ShowsListAPI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CF54DF392E62BC1500F3DDA1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +60,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF54DF672E62BDAF00F3DDA1 /* Service in Frameworks */,
+				CF54DF6C2E62BDC000F3DDA1 /* ShowsList in Frameworks */,
+				CF54DF642E62BDA000F3DDA1 /* Domain in Frameworks */,
+				CF54DF6E2E62BDC000F3DDA1 /* ShowsListAPI in Frameworks */,
+				CF54DF692E62BDAF00F3DDA1 /* ServiceAPI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +125,11 @@
 			);
 			name = App;
 			packageProductDependencies = (
+				CF54DF632E62BDA000F3DDA1 /* Domain */,
+				CF54DF662E62BDAF00F3DDA1 /* Service */,
+				CF54DF682E62BDAF00F3DDA1 /* ServiceAPI */,
+				CF54DF6B2E62BDC000F3DDA1 /* ShowsList */,
+				CF54DF6D2E62BDC000F3DDA1 /* ShowsListAPI */,
 			);
 			productName = App;
 			productReference = CF54DF2A2E62BC1500F3DDA1 /* App.app */;
@@ -195,6 +213,11 @@
 			);
 			mainGroup = CF54DF212E62BC1500F3DDA1;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CF54DF622E62BDA000F3DDA1 /* XCLocalSwiftPackageReference "../Domain" */,
+				CF54DF652E62BDAF00F3DDA1 /* XCLocalSwiftPackageReference "../Service" */,
+				CF54DF6A2E62BDC000F3DDA1 /* XCLocalSwiftPackageReference "../ShowsList" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CF54DF2B2E62BC1500F3DDA1 /* Products */;
 			projectDirPath = "";
@@ -583,6 +606,44 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CF54DF622E62BDA000F3DDA1 /* XCLocalSwiftPackageReference "../Domain" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Domain;
+		};
+		CF54DF652E62BDAF00F3DDA1 /* XCLocalSwiftPackageReference "../Service" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Service;
+		};
+		CF54DF6A2E62BDC000F3DDA1 /* XCLocalSwiftPackageReference "../ShowsList" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../ShowsList;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CF54DF632E62BDA000F3DDA1 /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Domain;
+		};
+		CF54DF662E62BDAF00F3DDA1 /* Service */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Service;
+		};
+		CF54DF682E62BDAF00F3DDA1 /* ServiceAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ServiceAPI;
+		};
+		CF54DF6B2E62BDC000F3DDA1 /* ShowsList */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShowsList;
+		};
+		CF54DF6D2E62BDC000F3DDA1 /* ShowsListAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ShowsListAPI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CF54DF222E62BC1500F3DDA1 /* Project object */;
 }

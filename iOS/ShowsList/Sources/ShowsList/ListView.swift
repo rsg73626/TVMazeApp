@@ -10,7 +10,7 @@ import Combine
 import ServiceAPI
 import SwiftUI
 
-struct ListView: View {
+public struct ListView: View {
     
     let service: ShowsServicing
     
@@ -21,19 +21,18 @@ struct ListView: View {
     public init(service: ShowsServicing) { self.service = service }
     
     public var body: some View {
-        List {
-            ForEach(items, id: \.id) { Text($0.name) }
+        VStack {
+            HStack {
+                Spacer()
+                Button("Next") { load(page: page + 1) }
+                Spacer()
+            }
+            List {
+                ForEach(items, id: \.id) { Text($0.name) }
+            }
+            .navigationTitle("Itens")
         }
-        .navigationTitle("Itens")
-//        .toolbar {
-//            ToolbarItem(placement: .topBarTrailing) {
-//                Button("Next") { load(page: page + 1) }
-//            }
-//            ToolbarItem(placement: .topBarLeading) {
-//                Button("Reload") { load(page: page) }
-//            }
-//        }
-        .onAppear { load(page: 1) }
+        .onAppear { load(page: page) }
         .onDisappear { cancellable?.cancel() }
     }
     
@@ -47,7 +46,7 @@ struct ListView: View {
                 receiveValue: { result in
                     switch result {
                     case let .shows(shows):
-                        items = shows
+                        items = items + shows
                     case .didFinish:
                         print("did finish")
                     }
