@@ -10,7 +10,6 @@ public enum ShowsResult {
     case didFinish
 }
 
-@available(macOS 10.15, *)
 public protocol ShowsServicing {
     func shows(page: UInt) -> AnyPublisher<ShowsResult, Error>
     func episodes(showId: Int) -> AnyPublisher<[Episode], Error>

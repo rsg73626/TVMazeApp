@@ -12,7 +12,7 @@ enum ShowsParseResult {
     
 }
 
-protocol ShowsParsing {
+public protocol ShowsParsing {
     func parse(data: Data) -> Result<[Show], Error>
 }
 

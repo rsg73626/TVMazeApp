@@ -10,21 +10,20 @@ import Domain
 import Foundation
 import ServiceAPI
 
-@available(macOS 10.15, *)
 public final class ShowsService: ShowsServicing {
     
     let session: URLSession
     let showsParser: ShowsParsing
     let episodesParser: EpisodesParsing
     
-    init(
+    public init(
         session: URLSession = .shared,
-        showsParser: ShowsParsing = ShowsParser(),
-        episodesParser: EpisodesParsing = EpisodesParser()
+        showsParser: ShowsParsing? = nil,
+        episodesParser: EpisodesParsing? = nil
     ) {
         self.session = session
-        self.showsParser = showsParser
-        self.episodesParser = episodesParser
+        self.showsParser = showsParser ?? ShowsParser()
+        self.episodesParser = episodesParser ?? EpisodesParser()
     }
     
     // MARK: ShowsServicing

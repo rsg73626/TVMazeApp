@@ -8,7 +8,7 @@
 import Domain
 import Foundation
 
-protocol EpisodesParsing {
+public protocol EpisodesParsing {
     func parse(data: Data) -> Result<[Episode], Error>
 }
 
