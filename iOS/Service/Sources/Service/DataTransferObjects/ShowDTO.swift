@@ -13,9 +13,9 @@ final class ShowDTO: Decodable {
     let summary: String?
     let genres: [String]?
     let premiered: String?
-    let image: ImageDTO?
+    let image: SimpleImageDTO?
     
-    init(id: Int, name: String?, summary: String?, genres: [String]?, premiered: String?, image: ImageDTO?) {
+    init(id: Int, name: String?, summary: String?, genres: [String]?, premiered: String?, image: SimpleImageDTO?) {
         self.id = id
         self.name = name
         self.summary = summary

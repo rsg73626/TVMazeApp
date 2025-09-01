@@ -10,9 +10,9 @@ public final class Show: Equatable {
     public let genres: [String]
     public let summary: String
     public let year: Int?
-    public let image: Image
+    public let image: SimpleImage
     
-    public init(id: Int, name: String, genres: [String], summary: String, year: Int?, image: Image) {
+    public init(id: Int, name: String, genres: [String], summary: String, year: Int?, image: SimpleImage) {
         self.id = id
         self.name = name
         self.genres = genres

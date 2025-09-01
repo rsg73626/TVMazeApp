@@ -2,17 +2,23 @@
 //  File.swift
 //  Domain
 //
-//  Created by Renan Germano on 29/08/25.
+//  Created by Renan Germano on 30/08/25.
 //
 
 import Foundation
 
 public final class Image {
-    public let medium: URL?
-    public let original: URL?
+    let width: Float
+    let height: Float
+    let url: URL
+    let poster: Bool
+    let main: Bool
     
-    public init(medium: URL?, original: URL?) {
-        self.medium = medium
-        self.original = original
+    public init(width: Float, height: Float, url: URL, poster: Bool, main: Bool) {
+        self.width = width
+        self.height = height
+        self.url = url
+        self.poster = poster
+        self.main = main
     }
 }

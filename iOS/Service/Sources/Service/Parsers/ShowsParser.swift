@@ -8,10 +8,6 @@
 import Domain
 import Foundation
 
-enum ShowsParseResult {
-    
-}
-
 public protocol ShowsParsing {
     func parse(data: Data) -> Result<[Show], Error>
 }
@@ -19,11 +15,11 @@ public protocol ShowsParsing {
 final class ShowsParser: ShowsParsing {
     
     let decoder: JSONDecoder
-    let imageParser: ImageParsing
+    let imageParser: SimpleImageParsing
     
     init(
         decoder: JSONDecoder = .init(),
-        imageParser: ImageParsing = ImageParser()
+        imageParser: SimpleImageParsing = SimpleImageParser()
     ) {
         self.decoder = decoder
         self.imageParser = imageParser

@@ -14,9 +14,9 @@ public final class Episode: Equatable {
     public let episode: Int
     public let name: String
     public let summary: String
-    public let image: Image
+    public let image: SimpleImage
     
-    public init(id: Int, season: Int, episode: Int, name: String, summary: String, image: Image) {
+    public init(id: Int, season: Int, episode: Int, name: String, summary: String, image: SimpleImage) {
         self.id = id
         self.season = season
         self.episode = episode

@@ -15,11 +15,11 @@ public protocol EpisodesParsing {
 final class EpisodesParser: EpisodesParsing {
     
     private let decoder: JSONDecoder
-    private let imageParser: ImageParsing
+    private let imageParser: SimpleImageParsing
     
     init(
         decoder: JSONDecoder = .init(),
-        imageParser: ImageParsing = ImageParser()
+        imageParser: SimpleImageParsing = SimpleImageParser()
     ) {
         self.decoder = decoder
         self.imageParser = imageParser

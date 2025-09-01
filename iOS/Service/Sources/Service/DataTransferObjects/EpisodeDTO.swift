@@ -14,9 +14,9 @@ final class EpisodeDTO: Decodable {
     let season: Int?
     let number: Int?
     let summary: String?
-    let image: ImageDTO?
+    let image: SimpleImageDTO?
     
-    init(id: Int?, name: String?, season: Int?, number: Int?, summary: String?, image: ImageDTO?) {
+    init(id: Int?, name: String?, season: Int?, number: Int?, summary: String?, image: SimpleImageDTO?) {
         self.id = id
         self.name = name
         self.season = season
