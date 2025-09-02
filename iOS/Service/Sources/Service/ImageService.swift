@@ -23,6 +23,10 @@ public final class ImageService: ImageServicing {
         self.imageParser = imageParser
     }
     
+    public convenience init(urlSession: URLSession = .shared,) {
+        self.init(session: urlSession)
+    }
+    
     public func images(showId: Int) -> AnyPublisher<[Image], Error> {
         session
             .dataTaskPublisher(for: urlForImages(showId: showId))

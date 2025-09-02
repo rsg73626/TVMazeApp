@@ -6,14 +6,46 @@
 //
 
 import ShowsList
+import ShowsListAPI
 import SwiftUI
 import Service
+import UIKit
 
 @main
 struct AppApp: App {
+    
     var body: some Scene {
         WindowGroup {
-            ListView.init(service: ShowsService())
+            NavigationViewWrapper()
         }
     }
+}
+
+fileprivate struct NavigationViewWrapper: UIViewControllerRepresentable {
+    
+    let navigationController = MainNavigation.mainNavigationController
+    let dataFetcher = DataFetcher()
+    let imageService = ImageService()
+    let showsService = ShowsService()
+    let builder = ShowsListBuilder()
+    
+    func makeUIViewController(context: Context) -> UINavigationController {
+        let dependencies = (dataFetcher, imageService, showsService)
+        let viewController = builder.build(dependencies: dependencies)
+        navigationController.setViewControllers([viewController], animated: false)
+        navigationController.navigationBar.barStyle = .default
+        navigationController.navigationBar.prefersLargeTitles = true
+        return navigationController
+    }
+    
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
+    
+}
+
+final class MainNavigation {
+    
+    static let mainNavigationController = UINavigationController()
+    
+    private init() { }
+    
 }
