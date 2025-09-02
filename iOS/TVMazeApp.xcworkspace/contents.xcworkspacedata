@@ -16,38 +16,5 @@
       <FileRef
          location = "group:App.xcodeproj">
       </FileRef>
-      <Group
-         location = "group:App"
-         name = "App">
-         <FileRef
-            location = "group:App.entitlements">
-         </FileRef>
-         <FileRef
-            location = "group:Assets.xcassets">
-         </FileRef>
-         <FileRef
-            location = "group:AppApp.swift">
-         </FileRef>
-         <FileRef
-            location = "group:ContentView.swift">
-         </FileRef>
-      </Group>
-      <Group
-         location = "group:AppTests"
-         name = "AppTests">
-         <FileRef
-            location = "group:AppTests.swift">
-         </FileRef>
-      </Group>
-      <Group
-         location = "group:AppUITests"
-         name = "AppUITests">
-         <FileRef
-            location = "group:AppUITestsLaunchTests.swift">
-         </FileRef>
-         <FileRef
-            location = "group:AppUITests.swift">
-         </FileRef>
-      </Group>
    </Group>
 </Workspace>

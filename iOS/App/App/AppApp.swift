@@ -35,6 +35,7 @@ fileprivate struct NavigationViewWrapper: UIViewControllerRepresentable {
         navigationController.setViewControllers([viewController], animated: false)
         navigationController.navigationBar.barStyle = .default
         navigationController.navigationBar.prefersLargeTitles = true
+        navigationController.navigationBar.isTranslucent = false
         return navigationController
     }
     
