@@ -12,6 +12,8 @@
 		CF54DF692E62BDAF00F3DDA1 /* ServiceAPI in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF682E62BDAF00F3DDA1 /* ServiceAPI */; };
 		CF54DF6C2E62BDC000F3DDA1 /* ShowsList in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF6B2E62BDC000F3DDA1 /* ShowsList */; };
 		CF54DF6E2E62BDC000F3DDA1 /* ShowsListAPI in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF6D2E62BDC000F3DDA1 /* ShowsListAPI */; };
+		CF54DF752E67F76000F3DDA1 /* Local in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF742E67F76000F3DDA1 /* Local */; };
+		CF54DF772E67F76000F3DDA1 /* LocalAPI in Frameworks */ = {isa = PBXBuildFile; productRef = CF54DF762E67F76000F3DDA1 /* LocalAPI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,9 +67,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF54DF752E67F76000F3DDA1 /* Local in Frameworks */,
 				CF54DF672E62BDAF00F3DDA1 /* Service in Frameworks */,
 				CF54DF6C2E62BDC000F3DDA1 /* ShowsList in Frameworks */,
 				CF54DF642E62BDA000F3DDA1 /* Domain in Frameworks */,
+				CF54DF772E67F76000F3DDA1 /* LocalAPI in Frameworks */,
 				CF54DF6E2E62BDC000F3DDA1 /* ShowsListAPI in Frameworks */,
 				CF54DF692E62BDAF00F3DDA1 /* ServiceAPI in Frameworks */,
 			);
@@ -137,6 +141,8 @@
 				CF54DF682E62BDAF00F3DDA1 /* ServiceAPI */,
 				CF54DF6B2E62BDC000F3DDA1 /* ShowsList */,
 				CF54DF6D2E62BDC000F3DDA1 /* ShowsListAPI */,
+				CF54DF742E67F76000F3DDA1 /* Local */,
+				CF54DF762E67F76000F3DDA1 /* LocalAPI */,
 			);
 			productName = App;
 			productReference = CF54DF2A2E62BC1500F3DDA1 /* App.app */;
@@ -224,6 +230,7 @@
 				CF54DF622E62BDA000F3DDA1 /* XCLocalSwiftPackageReference "../Domain" */,
 				CF54DF652E62BDAF00F3DDA1 /* XCLocalSwiftPackageReference "../Service" */,
 				CF54DF6A2E62BDC000F3DDA1 /* XCLocalSwiftPackageReference "../ShowsList" */,
+				CF54DF732E67F76000F3DDA1 /* XCLocalSwiftPackageReference "../Local" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CF54DF2B2E62BC1500F3DDA1 /* Products */;
@@ -627,6 +634,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../ShowsList;
 		};
+		CF54DF732E67F76000F3DDA1 /* XCLocalSwiftPackageReference "../Local" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Local;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -649,6 +660,14 @@
 		CF54DF6D2E62BDC000F3DDA1 /* ShowsListAPI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ShowsListAPI;
+		};
+		CF54DF742E67F76000F3DDA1 /* Local */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Local;
+		};
+		CF54DF762E67F76000F3DDA1 /* LocalAPI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LocalAPI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

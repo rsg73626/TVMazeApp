@@ -4,35 +4,38 @@
 import PackageDescription
 
 let package = Package(
-    name: "Service",
+    name: "Local",
     platforms: [
         .iOS(.v18)
     ],
     products: [
-        .library(name: "ServiceAPI", targets: ["ServiceAPI"]),
-        .library(name: "Service", targets: ["Service"]),
+        .library(name: "LocalAPI", targets: ["LocalAPI"]),
+        .library(name: "Local", targets: ["Local"]),
     ],
     dependencies: [
         .package(path: "../Domain")
     ],
     targets: [
         .target(
-            name: "ServiceAPI",
+            name: "LocalAPI",
             dependencies: [
                 .product(name: "Domain", package: "Domain")
             ]
         ),
         .target(
-            name: "Service",
+            name: "Local",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
-                "ServiceAPI"
-            ]
+                "LocalAPI"
+            ],
+            resources: [
+                .process("Model/DataModel.xcdatamodeld")
+            ],
         ),
         .testTarget(
-            name: "ServiceTests",
+            name: "LocalTests",
             dependencies: [
-                "Service"
+                "Local"
             ]
         ),
     ]
