@@ -26,7 +26,7 @@ fileprivate struct NavigationViewWrapper: UIViewControllerRepresentable {
     let navigationController = MainNavigation.mainNavigationController
     let dataFetcher = DataFetcher()
     let imageService = ImageService()
-    let showsService = ShowsService()
+    let showsService = RetryShowsService(service: ShowsService())
     let builder = ShowsListBuilder()
     
     func makeUIViewController(context: Context) -> UINavigationController {

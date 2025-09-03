@@ -15,6 +15,7 @@ protocol ShowsListPresentingListener {
     func viewDidLoad()
     func didSelect(show: Show)
     func didShowItemAt(index: Int)
+    func didPressRetryButton()
 }
 
 protocol ShowsListPresenting {
@@ -52,6 +53,10 @@ final class ShowsListInteractor: ShowsListPresentingListener {
         if index == shows.count - 1 {
             getNextPage()
         }
+    }
+    
+    func didPressRetryButton() {
+        fetchData()
     }
     
     // MARK: - Private

@@ -53,6 +53,11 @@
 			path = AppUITests;
 			sourceTree = "<group>";
 		};
+		CF54DF702E67706E00F3DDA1 /* Adapters */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Adapters;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +93,7 @@
 		CF54DF212E62BC1500F3DDA1 = {
 			isa = PBXGroup;
 			children = (
+				CF54DF702E67706E00F3DDA1 /* Adapters */,
 				CF54DF2C2E62BC1500F3DDA1 /* App */,
 				CF54DF3B2E62BC1500F3DDA1 /* AppTests */,
 				CF54DF452E62BC1500F3DDA1 /* AppUITests */,
@@ -122,6 +128,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				CF54DF2C2E62BC1500F3DDA1 /* App */,
+				CF54DF702E67706E00F3DDA1 /* Adapters */,
 			);
 			name = App;
 			packageProductDependencies = (

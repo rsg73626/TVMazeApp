@@ -80,7 +80,7 @@ struct ShowsListView: View {
             Text("Ops..")
             Text("Something went wrong...")
             Spacer()
-            Button(action: { }) {
+            Button(action: { listener?.didPressRetryButton() }) {
                 Text("Retry")
             }
             Spacer()
@@ -96,7 +96,7 @@ struct ShowsListView: View {
     }
     
     private var listView: some View {
-        List(Array(viewModel.shows.enumerated()), id: \.1.id) { index, show in
+        List(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
             ShowView(vm: showViewModelFactory.build(show: show))
                 .onTapGesture {
                     listener?.didSelect(show: show)
