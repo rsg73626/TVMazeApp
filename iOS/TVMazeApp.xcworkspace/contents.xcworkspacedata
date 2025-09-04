@@ -5,6 +5,9 @@
       location = "group:Local">
    </FileRef>
    <FileRef
+      location = "group:ShowDetails">
+   </FileRef>
+   <FileRef
       location = "group:ShowsList">
    </FileRef>
    <FileRef

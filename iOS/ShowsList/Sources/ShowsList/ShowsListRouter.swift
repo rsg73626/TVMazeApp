@@ -6,20 +6,30 @@
 //
 
 import Domain
+import ShowDetailsAPI
 import ShowsListAPI
 import UIKit
 
 public protocol ShowsListRouting {
-    func showDetails(for: Show)
+    func showDetails(for show: Show)
 }
 
-final class ShowsListRouter: ShowsListRouting {
+final class ShowsListRouter: @preconcurrency ShowsListRouting {
     
     weak var viewController: UIViewController?
     
+    let showDetailsBuilder: ShowDetailsBuilding
+    
+    init(showDetailsBuilder: ShowDetailsBuilding) {
+        self.showDetailsBuilder = showDetailsBuilder
+    }
+    
     // MARK: ShowsListRouting
     
-    func showDetails(for: Show) {
-        // TODO: navigate to show details
+    @MainActor func showDetails(for show: Show) {
+        viewController?.navigationController?.pushViewController(
+            showDetailsBuilder.build(show: show),
+            animated: true
+        )
     }
 }

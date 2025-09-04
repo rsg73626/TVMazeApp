@@ -4,44 +4,40 @@
 import PackageDescription
 
 let package = Package(
-    name: "ShowsList",
+    name: "ShowDetails",
     platforms: [
         .iOS(.v18)
     ],
     products: [
-        .library(name: "ShowsListAPI", targets: ["ShowsListAPI"]),
-        .library(name: "ShowsList", targets: ["ShowsList"]),
+        .library(name: "ShowDetailsAPI", targets: ["ShowDetailsAPI"]),
+        .library(name: "ShowDetails", targets: ["ShowDetails"]),
     ],
     dependencies: [
         .package(path: "../Domain"),
         .package(path: "../Service"),
-        .package(path: "../ShowDetails"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "ShowsListAPI",
+            name: "ShowDetailsAPI",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
-                .product(name: "ServiceAPI", package: "Service"),
-                .product(name: "ShowDetailsAPI", package: "ShowDetails")
+                .product(name: "ServiceAPI", package: "Service")
             ]
         ),
         .target(
-            name: "ShowsList",
+            name: "ShowDetails",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
                 .product(name: "ServiceAPI", package: "Service"),
-                .product(name: "ShowDetails", package: "ShowDetails"),
-                .product(name: "ShowDetailsAPI", package: "ShowDetails"),
-                "ShowsListAPI"
+                "ShowDetailsAPI"
             ]
         ),
         .testTarget(
-            name: "ShowsListTests",
+            name: "ShowDetailsTests",
             dependencies: [
-                "ShowsList"
+                "ShowDetails"
             ]
         ),
     ]

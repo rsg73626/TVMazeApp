@@ -7,14 +7,26 @@
 
 import Domain
 import ServiceAPI
+import ShowDetailsAPI
 import UIKit
 
-public typealias ShowsListDependencies = (
-    dataFetcher: DataFetching,
-    imageService: ImageServicing,
-    showsService: ShowsServicing
-)
+public struct ShowsListDependencies {
+    
+    public let dataFetcher: DataFetching
+    public let imageService: ImageServicing
+    public let showsService: ShowsServicing
+    public let showDetailsBuilder: ShowDetailsBuilding
+    
+    public init(dataFetcher: DataFetching, imageService: ImageServicing, showsService: ShowsServicing, showDetailsBuilder: ShowDetailsBuilding) {
+        self.dataFetcher = dataFetcher
+        self.imageService = imageService
+        self.showsService = showsService
+        self.showDetailsBuilder = showDetailsBuilder
+    }
+}
 
 public protocol ShowsListBuilding {
-    func build(dependencies: ShowsListDependencies) -> UIViewController
+    init(dependencies: ShowsListDependencies)
+    
+    func build() -> UIViewController
 }

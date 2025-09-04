@@ -8,11 +8,11 @@
 import Foundation
 
 public final class Image {
-    let width: Float
-    let height: Float
-    let url: URL
-    let poster: Bool
-    let main: Bool
+    public let width: Float
+    public let height: Float
+    public let url: URL
+    public let poster: Bool
+    public let main: Bool
     
     public init(width: Float, height: Float, url: URL, poster: Bool, main: Bool) {
         self.width = width

@@ -9,19 +9,22 @@ import ShowsListAPI
 import SwiftUI
 import UIKit
 
-@MainActor
 public final class ShowsListBuilder: @preconcurrency ShowsListBuilding {
     
-    public init() { }
+    let dependencies: ShowsListDependencies
 
     // MARK: - ShowsListBuilding
     
-    public func build(dependencies: ShowsListDependencies) -> UIViewController {
+    public init(dependencies: ShowsListDependencies) {
+        self.dependencies = dependencies
+    }
+    
+    @MainActor public func build() -> UIViewController {
         let imageLoader = ImageLoader(dataFetcher: dependencies.dataFetcher)
         let factory = ShowViewModelFactory(imageLoader: imageLoader)
         let title = "TVMaze" // TODO: Use localized strings
         var view = ShowsListView(title: title, shows: [], showViewModelFactory: factory)
-        let router = ShowsListRouter()
+        let router = ShowsListRouter(showDetailsBuilder: dependencies.showDetailsBuilder)
         let interactor = ShowsListInteractor(
             router: router,
             showsService: dependencies.showsService

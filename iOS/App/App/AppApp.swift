@@ -5,6 +5,8 @@
 //  Created by Renan Germano on 30/08/25.
 //
 
+import ShowDetails
+import ShowDetailsAPI
 import ShowsList
 import ShowsListAPI
 import SwiftUI
@@ -24,14 +26,10 @@ struct AppApp: App {
 
 fileprivate struct NavigationViewWrapper: UIViewControllerRepresentable {
     
-    let navigationController = MainNavigation.mainNavigationController
-    let dataFetcher = DataFetcher()
-    let imageService = ImageService()
-    let builder = ShowsListBuilder()
+    var navigationController = MainNavigation.mainNavigationController
     
     func makeUIViewController(context: Context) -> UINavigationController {
-        let dependencies = (dataFetcher, imageService, showsService())
-        let viewController = builder.build(dependencies: dependencies)
+        let viewController = DI.showsListBuilder.build()
         navigationController.setViewControllers([viewController], animated: false)
         navigationController.navigationBar.barStyle = .default
         navigationController.navigationBar.prefersLargeTitles = true
@@ -41,20 +39,46 @@ fileprivate struct NavigationViewWrapper: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
     
-    // MARK: - Private
-    
-    private func showsService() -> ShowsServicing {
-        let service = ShowsService()
-        let retry = RetryShowsService(service: service)
-        let local = LocalShowsService(service: retry)
-        return local
-    }
-    
 }
 
 final class MainNavigation {
     
     static let mainNavigationController = UINavigationController()
+    
+    private init() { }
+    
+}
+
+final class DI {
+
+    private static let dataFetcher = DataFetcher()
+    private static let imageService = ImageService()
+    
+    private static var showsService: ShowsServicing = {
+        let service = ShowsService()
+        let retry = RetryShowsService(service: service)
+        let local = LocalShowsService(service: retry)
+        return local
+    }()
+    
+    private static var showDetailsBuilder: ShowDetailsBuilding = {
+        let dependencies = ShowDetailsDependencies(
+            dataFetcher: dataFetcher,
+            imageService: imageService,
+            showsService: showsService
+        )
+        return ShowDetailsBuilder(dependencies: dependencies)
+    }()
+    
+    static var showsListBuilder: ShowsListBuilding = {
+        let dependencies = ShowsListDependencies(
+            dataFetcher: dataFetcher,
+            imageService: imageService,
+            showsService: showsService,
+            showDetailsBuilder: showDetailsBuilder
+        )
+        return ShowsListBuilder(dependencies: dependencies)
+    }()
     
     private init() { }
     
