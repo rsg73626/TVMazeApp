@@ -10,22 +10,82 @@ import Domain
 import SwiftUI
 
 struct ShowView: View {
-    @ObservedObject var vm: ShowViewModel
+    @ObservedObject var viewModel: ShowViewModel
+    
+    private let grid: Bool
+    
+    init(
+        viewModel: ShowViewModel,
+        grid: Bool = false
+    ) {
+        self.viewModel = viewModel
+        self.grid = grid
+    }
 
     var body: some View {
+        if grid {
+            gridView
+        } else {
+            nonGridView
+        }
+    }
+    
+    private var nonGridView: some View {
         HStack(spacing: 12) {
             Group {
-                if let img = vm.image {
-                    Image(uiImage: img).resizable().scaledToFill()
+                if let img = viewModel.image {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 220)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 } else {
-                    Rectangle().opacity(0.1) // placeholder
+                    Rectangle()
+                        .opacity(0.1)
+                        .scaledToFill()
+                        .frame(height: 220)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
             }
-            .frame(width: 48, height: 48)
+            .frame(width: 160, height: 220)
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
-            Text(vm.name)
+            Text(viewModel.name)
                 .lineLimit(1)
+        }
+    }
+    
+    private var gridView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Group {
+                if let img = viewModel.image {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 220)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                } else {
+                    Rectangle()
+                        .opacity(0.1)
+                        .scaledToFill()
+                        .frame(height: 220)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+            }
+            .frame(width: 160, height: 220)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+
+            Text(viewModel.name)
+                .font(.subheadline)
+                .lineLimit(2)
         }
     }
 }

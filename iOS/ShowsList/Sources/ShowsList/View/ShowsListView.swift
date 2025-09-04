@@ -30,14 +30,28 @@ fileprivate final class ShowsListViewModel: ObservableObject {
     }
 }
 
+fileprivate enum LayoutMode: String, CaseIterable, Identifiable {
+    case list = "Lista"
+    case grid = "Grid"
+    var id: String { rawValue }
+    var icon: String {
+        switch self {
+        case .list: return "list.bullet"
+        case .grid: return "square.grid.2x2"
+        }
+    }
+}
+
 struct ShowsListView: View {
     
     var listener: ShowsListPresentingListener?
     
+    private let showViewModelFactory: ShowViewModelFactoring
+    private let gridColumns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
+    
     @ObservedObject private var viewModel: ShowsListViewModel
     @State private var didLoad: Bool = false
-    
-    private let showViewModelFactory: ShowViewModelFactoring
+    @State private var layout: LayoutMode = .list
     
     init(
         title: String,
@@ -54,14 +68,35 @@ struct ShowsListView: View {
         )
         self.showViewModelFactory = showViewModelFactory
     }
-
+    
     var body: some View {
-        if viewModel.loading {
-            loadingView
-        } else if viewModel.shows.isEmpty {
-            retryView
-        } else {
-            listView
+        Group {
+            if viewModel.loading {
+                loadingView
+            } else if viewModel.shows.isEmpty {
+                retryView
+            } else {
+                if layout == .grid {
+                    gridView
+                } else {
+                    listView
+                }
+            }
+        }
+        .navigationBarTitleDisplayMode(.large)
+        .navigationTitle(viewModel.title)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                // Picker segmentado com duas opções
+                Picker("Layout", selection: $layout) {
+                    ForEach(LayoutMode.allCases) { m in
+                        Label(m.rawValue, systemImage: m.icon).tag(m)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(width: 160) // ajuda a caber na direita
+                .accessibilityLabel("Alternar layout")
+            }
         }
     }
     
@@ -75,8 +110,6 @@ struct ShowsListView: View {
             }
             Spacer()
         }
-        .navigationBarTitleDisplayMode(.large)
-        .navigationTitle(viewModel.title)
     }
     
     private var retryView: some View {
@@ -96,14 +129,12 @@ struct ShowsListView: View {
                 didLoad = true
             }
         }
-        .navigationBarTitleDisplayMode(.large)
-        .navigationTitle(viewModel.title)
     }
     
     private var listView: some View {
         List {
             ForEach(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
-                ShowView(vm: showViewModelFactory.build(show: show))
+                ShowView(viewModel: showViewModelFactory.build(show: show))
                     .onTapGesture {
                         listener?.didSelect(show: show)
                     }
@@ -122,8 +153,34 @@ struct ShowsListView: View {
                 .frame(height: 44)
             }
         }
-        .navigationBarTitleDisplayMode(.large)
-        .navigationTitle(viewModel.title)
+    }
+    
+    private var gridView: some View {
+        ScrollView {
+            LazyVGrid(columns: gridColumns, spacing: 12) {
+                ForEach(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
+                    ShowView(viewModel: showViewModelFactory.build(show: show), grid: true)
+                        .onTapGesture {
+                            listener?.didSelect(show: show)
+                        }
+                        .onAppear {
+                            listener?.didShowItemAt(index: index)
+                        }
+                }
+                if viewModel.isPaginating {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Text("Loading...")
+                            Spacer()
+                        }
+                    }
+                    .frame(height: 44)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+        }
     }
 }
 
@@ -148,7 +205,6 @@ extension ShowsListView: @preconcurrency ShowsListPresenting {
     func update(loadingNewPage value: Bool) {
         viewModel.isPaginating = value
     }
-
+    
 }
-
 
