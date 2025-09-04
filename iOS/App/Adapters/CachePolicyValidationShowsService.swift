@@ -65,51 +65,6 @@ final class CachePolicyValidationShowsService: ShowsServicing {
                 }
             }
             .eraseToAnyPublisher()
-        
-//        return guy.eraseToAnyPublisher()
-        
-        // fetching local data
-//        return repo
-//            .pagination(id: pageId)
-//            .catch { _ in
-//                Just(([Show](), Self.now()))
-//                    .setFailureType(to: Error.self)
-//                    .eraseToAnyPublisher()
-//            }
-//            .map { pagination -> AnyPublisher<ShowsResult, Error> in
-//                // validating local data
-//                let now = Self.now()
-//                if (now - pagination.timeStamp) < cacheDuration, !pagination.shows.isEmpty {
-//                    // valid local data
-//                    // extends local data duration with current time stamp
-//                    self.update(pageId: pageId, timestamp: now)
-//                    return Just(ShowsResult.shows(pagination.shows))
-//                        .setFailureType(to: Error.self)
-//                        .eraseToAnyPublisher()
-//                } else {
-//                    // invalid local data
-//                    // deletes local data
-//                    self.delete(pageId: pageId)
-//                    return service
-//                        .shows(page: page)
-//                        .flatMap { result in
-//                            switch result {
-//                            case let .shows(shows):
-//                                // saves data from api locally
-//                                self.save(pageId: pageId, shows: shows)
-//                                return Just(ShowsResult.shows(shows))
-//                                    .setFailureType(to: Error.self)
-//                                    .eraseToAnyPublisher()
-//                            case .didFinish:
-//                                return Just(ShowsResult.didFinish)
-//                                    .setFailureType(to: Error.self)
-//                                    .eraseToAnyPublisher()
-//                            }
-//                        }.eraseToAnyPublisher()
-//                }
-//            }
-//            .switchToLatest()
-//            .eraseToAnyPublisher()
     }
     
     func episodes(showId: Int) -> AnyPublisher<[Episode], Error> {
