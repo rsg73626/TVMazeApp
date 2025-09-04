@@ -32,11 +32,5 @@ let package = Package(
                 .process("Model/DataModel.xcdatamodeld")
             ],
         ),
-        .testTarget(
-            name: "LocalTests",
-            dependencies: [
-                "Local"
-            ]
-        ),
     ]
 )

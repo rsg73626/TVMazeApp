@@ -12,24 +12,24 @@ import SwiftUI
 
 struct ShowDetailsView: View {
     
-    @ObservedObject private var viewModel: ShowDetailsViewModel
+    var listener: ShowDetailsPresentingListener?
+    
+    @ObservedObject private var viewModel = ShowDetailsViewModel()
+    @State private var didLoad: Bool = false
     
     private let padding: CGFloat = 16
-    
-    init(viewModel: ShowDetailsViewModel) {
-        self.viewModel = viewModel
-    }
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                if let img = viewModel.image {
+                switch viewModel.image {
+                case let .image(img):
                     Image(uiImage: img)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(maxWidth: .infinity)
                         .padding(padding)
-                } else {
+                case .loading:
                     VStack {
                         Spacer()
                         HStack {
@@ -46,7 +46,7 @@ struct ShowDetailsView: View {
                     .frame(maxWidth: .infinity, minHeight: 500)
                 }
                 
-                Text(viewModel.name)
+                Text(viewModel.title)
                     .font(.title).bold()
                     .padding(.horizontal, padding)
                 
@@ -68,31 +68,36 @@ struct ShowDetailsView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            if !didLoad {
+                listener?.viewDidLoad()
+                didLoad = true
+            }
+        }
     }
     
 }
 
-class Test: ShowDetailsImageLoading {
-    func image(for show: Show) -> AnyPublisher<UIImage, Never> {
-        Just(UIImage()).eraseToAnyPublisher()
+extension ShowDetailsView: @preconcurrency ShowDetailsPresenting {
+    
+    func update(image: ImageState) {
+        viewModel.image = image
     }
-}
+    
+    func update(title: String) {
+        viewModel.title = title
+    }
+    
+    func update(year: String?) {
+        viewModel.year = year
+    }
+    
+    func update(genres: String) {
+        viewModel.genres = genres
+    }
+    
+    func update(summary: AttributedString) {
+        viewModel.summary = summary
+    }
 
-#Preview {
-    ShowDetailsView(
-        viewModel: ShowDetailsViewModel(
-            show: Show(
-                id: 1,
-                name: "Test",
-                genres: [""],
-                summary: "Test",
-                year: 2000,
-                image: .init(
-                    medium: nil,
-                    original: nil
-                )
-            ),
-            imageLoader: Test()
-        )
-    )
 }

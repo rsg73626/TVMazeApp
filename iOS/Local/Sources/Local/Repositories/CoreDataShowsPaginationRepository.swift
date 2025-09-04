@@ -50,7 +50,6 @@ public final class CoreDataShowsPaginationRepository: ShowsPaginationRepository 
         }.eraseToAnyPublisher()
     }
     
-    
     public func delete(id: String) -> AnyPublisher<Void, Error> {
         Future { [weak self] promise in
             guard let self else { return promise(.failure(NSError())) }
