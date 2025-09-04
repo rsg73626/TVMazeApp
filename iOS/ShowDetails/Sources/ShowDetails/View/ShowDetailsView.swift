@@ -61,10 +61,15 @@ struct ShowDetailsView: View {
                     .padding(.horizontal, padding)
                     .lineLimit(2)
                 
-                Text(viewModel.summary)
+                Text(
+                    viewModel
+                        .summary
+                        .overridingColor(.primary)
+                )
                     .font(.body)
                     .padding(.horizontal, padding)
                     .padding(.bottom, padding)
+                    
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -100,4 +105,15 @@ extension ShowDetailsView: @preconcurrency ShowDetailsPresenting {
         viewModel.summary = summary
     }
 
+}
+
+extension AttributedString {
+    
+    func overridingColor(_ color: Color) -> AttributedString {
+        var copy = self
+        for run in copy.runs {
+            copy[run.range].foregroundColor = color
+        }
+        return copy
+    }
 }

@@ -153,6 +153,7 @@ struct ShowsListView: View {
                 .frame(height: 44)
             }
         }
+        .scrollIndicators(.hidden)
     }
     
     private var gridView: some View {
@@ -180,6 +181,7 @@ struct ShowsListView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
+            .scrollIndicators(.hidden)
         }
     }
 }
