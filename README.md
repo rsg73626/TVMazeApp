@@ -39,6 +39,86 @@ TVMaze app is a native iOS application that allows users to see a list of shows 
 
 <img src="gifs/6_Dark.gif" width="300"/>
 
+## Project architecture
+
+The project is organized in different modules, which one with its responsibilities. Each module contains an interface and an implementation layer. The modules know each other only through the interface layer. The App module is responsible for integrating everyone to build the application, injecting instances of specific types by dependency injection.
+
+The application contains the following modules:
+
+- Domain: contains the definitions of the fundamental entities manipulated in the application, such as the definition of the `Show` entity.
+- Service: responsible for itching the restful API
+  - ServiceAPI: interface
+  - Service: implementation with `URLSession`
+- Local: responsible for storing data locally
+  - LocalAPI: interface
+  - Local: implementation with `CoreData`
+- ShowsList: the list of shows
+  - ShowsListAPI: interface
+  - ShowsList: implementation with SwiftUI + Combine
+- ShowDetails: the details of a show
+  - ShowDetailsAPI: interface
+  - ShowDetail: implementation with SwiftUI + Combine
+- App: integration module
+
+The modules depends on each other on the following way:
+
+- Domain
+- ServiceAPI
+  - Domain
+- Service
+  - Domain
+  - ServiceAPI
+- LocalAPI
+  - Domain
+- Local
+  - Domain
+  - LocalAPI
+- ShowsListAPI
+  - Domain
+  - ServiceAPI
+  - ShowsDetailsAPI
+- ShowsList
+  - Domain
+  - ServiceAPI
+  - ShowsDetailsAPI
+  - ShowsListAPI
+- ShowDetailsAPI
+  - Domain
+  - ServiceAPI
+- ShowsDetails
+  - Domain
+  - ServiceAPI
+  - ShowDetailsAPI
+- App
+  - ALL MODULES
+
+This architecture could be improved by updating the feature modules (list and details) to declare their own service interface, instead of depending directly to the service module, leaving them more independent of each other. They could be connect thorough the integration module `App`.
+
+The retry policy and the caching logic is implemented on the App module. It uses some adapters to connect the instance of service and local implementations. 
+
+The integration module also does the injection of dependencies necessary by the feature modules. 
+
+## Presentation architecture 
+
+For each screen (list and details) the VIPER architecture was used.
+
+**View**: user interface; handles layout logic; receives interactions from the user and passes it to interfactor through the presenter
+**Interactor**: interacts with data layer (service); handle business logic; calls presenter to display content; interacts with router for navigation.
+**Presenter**: invokes view to display data; receives interactions from the view and passed to the interactor.
+**Entity**: represent the data of the application, in this case, the shows and images.
+**Router**: handles navigation
+
+I also used **ViewModel** objects to help display content, with special attention to the image download of each cell in the list. In this case the ViewModel can be seen as an extension of the interactor. 
+
+## Improvements
+
+ - Increase code coverage with unit and ui tests.
+ - Decouple feature modules from service.
+ - Standardize presentation architecture (it's not following VIPER 100%).
+ - Add a DI framework so the application can be better mainteined.
+ - Increment details to fetch and display episodes.
+ - Install swift lint.
+
 ## Usage of the API
 
 The API from the TVMaze website exposes two sets of endpoints: public and restricted. Public endpoints allow general data fetch and search, while restricted allows the manipulation of data associated to specific users from the website (for instance, favorite/unfavorite a show). The restricted API requires authentication with an API key, which isn’t necessary for the public one.  This project is using the public API.
@@ -102,7 +182,7 @@ If all attempts fail it must return an error.
 ### Fetching first page
 If it’s not possible to fetch any data for any reason an error screen with a message must be displayed with a retry button.
 
-# Downloading images
+### Downloading images
 If it’s not possible to download an image a placeholder must be used.
 
 Attention: there are some cases when an image might not be available but there is another option available. The placeholder must be used only in case none of the alternatives could be downloaded. 
