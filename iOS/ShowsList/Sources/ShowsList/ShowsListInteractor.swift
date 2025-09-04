@@ -77,11 +77,11 @@ final class ShowsListInteractor: ShowsListPresentingListener {
             .receive(on: DispatchQueue.main)
             .sink(
                 receiveCompletion: { failure in
-                    self.presenter?.hideLoading()
                     switch failure {
                     case .finished:
-                        self.handlePagingError()
+                        break
                     case .failure(let error):
+                        self.presenter?.hideLoading()
                         self.track(apiError: error)
                         self.handlePagingError()
                     }
@@ -117,14 +117,14 @@ final class ShowsListInteractor: ShowsListPresentingListener {
                     guard let self else { return }
                     switch failure {
                     case .finished:
-                        self.handlePagingError()
+                        break
                     case .failure(let error):
                         self.track(apiError: error)
                         self.handlePagingError(allowPagingEnd: true)
                         // TODO: Update this logic. The way it is, the paging will also finish in case the API call fails but there was already some data being presented. This decision was taken because the retry politics would be already applied here; this is, if an error is received here, it means the same request was already tried at least three times, so it's not a matter of retrying the same request again. The ideal solution would be to wait some time and than retry; or, also, skip the current page being fetched and going to the next. This is a decision that should be taken awareness of all team and PO
+                        self.isPaginating = false
+                        self.presenter?.update(loadingNewPage: false)
                     }
-                    self.isPaginating = false
-                    self.presenter?.update(loadingNewPage: false)
                 },
                 receiveValue: { [weak self] result in
                     guard let self else { return }
@@ -135,7 +135,6 @@ final class ShowsListInteractor: ShowsListPresentingListener {
                         self.currentPage = nextPage
                     case .didFinish:
                         self.didFinishPaging = true
-                        break
                     }
                     self.isPaginating = false
                     self.presenter?.update(loadingNewPage: false)

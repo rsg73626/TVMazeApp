@@ -18,8 +18,6 @@ let package = Package(
         .package(path: "../ShowDetails"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "ShowsListAPI",
             dependencies: [
@@ -41,7 +39,9 @@ let package = Package(
         .testTarget(
             name: "ShowsListTests",
             dependencies: [
-                "ShowsList"
+                "ShowsList",
+                .product(name: "ServiceAPI", package: "Service"),
+                .product(name: "ServiceAPIMocks", package: "Service")
             ]
         ),
     ]

@@ -10,7 +10,7 @@ import ShowDetailsAPI
 import ShowsListAPI
 import UIKit
 
-public protocol ShowsListRouting {
+protocol ShowsListRouting {
     func showDetails(for show: Show)
 }
 

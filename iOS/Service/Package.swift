@@ -10,6 +10,7 @@ let package = Package(
     ],
     products: [
         .library(name: "ServiceAPI", targets: ["ServiceAPI"]),
+        .library(name: "ServiceAPIMocks", targets: ["ServiceAPIMocks"]),
         .library(name: "Service", targets: ["Service"]),
     ],
     dependencies: [
@@ -26,6 +27,12 @@ let package = Package(
             name: "Service",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
+                "ServiceAPI"
+            ]
+        ),
+        .target(
+            name: "ServiceAPIMocks",
+            dependencies: [
                 "ServiceAPI"
             ]
         ),
