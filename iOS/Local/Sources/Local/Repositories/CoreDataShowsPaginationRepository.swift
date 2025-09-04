@@ -78,7 +78,9 @@ public final class CoreDataShowsPaginationRepository: ShowsPaginationRepository 
     
     public func pagination(id: String) -> AnyPublisher<(shows: [Show], timeStamp: Double), Error> {
         Future { [weak self] promise in
-            guard let self else { return promise(.failure(NSError())) }
+            guard let self else {
+                return promise(.failure(NSError()))
+            }
             let context = self.context
             context.perform {
                 do {

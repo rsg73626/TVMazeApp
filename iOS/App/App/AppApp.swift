@@ -9,6 +9,7 @@ import ShowsList
 import ShowsListAPI
 import SwiftUI
 import Service
+import ServiceAPI
 import UIKit
 
 @main
@@ -26,11 +27,10 @@ fileprivate struct NavigationViewWrapper: UIViewControllerRepresentable {
     let navigationController = MainNavigation.mainNavigationController
     let dataFetcher = DataFetcher()
     let imageService = ImageService()
-    let showsService = RetryShowsService(service: ShowsService())
     let builder = ShowsListBuilder()
     
     func makeUIViewController(context: Context) -> UINavigationController {
-        let dependencies = (dataFetcher, imageService, showsService)
+        let dependencies = (dataFetcher, imageService, showsService())
         let viewController = builder.build(dependencies: dependencies)
         navigationController.setViewControllers([viewController], animated: false)
         navigationController.navigationBar.barStyle = .default
@@ -40,6 +40,15 @@ fileprivate struct NavigationViewWrapper: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
+    
+    // MARK: - Private
+    
+    private func showsService() -> ShowsServicing {
+        let service = ShowsService()
+        let retry = RetryShowsService(service: service)
+        let local = LocalShowsService(service: retry)
+        return local
+    }
     
 }
 

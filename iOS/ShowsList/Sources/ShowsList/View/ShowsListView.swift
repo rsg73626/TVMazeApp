@@ -121,7 +121,7 @@ extension ShowsListView: @preconcurrency ShowsListPresenting {
     }
     
     func update(list: [Show]) {
-        viewModel.shows.append(contentsOf: list)
+        viewModel.shows = list
     }
     
     func update(title: String) {

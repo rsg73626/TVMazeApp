@@ -61,15 +61,10 @@ final class ShowsListInteractor: ShowsListPresentingListener {
     
     // MARK: - Private
     
-    private var shows = [Show]() {
-        didSet {
-            paginationIndex = shows.count - 10
-        }
-    }
+    private var shows = [Show]()
     private var cancelables = Set<AnyCancellable>()
     
     private var didFinishPaging = false
-    private var paginationIndex: Int?
     private var currentPage: UInt = .zero
     private var isPaginating = false
     
@@ -108,12 +103,13 @@ final class ShowsListInteractor: ShowsListPresentingListener {
               !isPaginating else {
             return
         }
-        cancelCurrentSubscriptions()
         isPaginating = true
+        cancelCurrentSubscriptions()
         let nextPage = currentPage + 1
         showsService
             .shows(page: nextPage)
             .receive(on: DispatchQueue.main)
+            .first()
             .sink(
                 receiveCompletion: { failure in
                     switch failure {
