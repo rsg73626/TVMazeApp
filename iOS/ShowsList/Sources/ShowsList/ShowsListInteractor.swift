@@ -23,6 +23,7 @@ protocol ShowsListPresenting {
     func hideLoading()
     func update(list: [Show])
     func update(title: String)
+    func update(loadingNewPage value: Bool)
 }
 
 final class ShowsListInteractor: ShowsListPresentingListener {
@@ -104,6 +105,7 @@ final class ShowsListInteractor: ShowsListPresentingListener {
             return
         }
         isPaginating = true
+        presenter?.update(loadingNewPage: true)
         cancelCurrentSubscriptions()
         let nextPage = currentPage + 1
         showsService
@@ -111,7 +113,8 @@ final class ShowsListInteractor: ShowsListPresentingListener {
             .receive(on: DispatchQueue.main)
             .first()
             .sink(
-                receiveCompletion: { failure in
+                receiveCompletion: { [weak self] failure in
+                    guard let self else { return }
                     switch failure {
                     case .finished:
                         self.handlePagingError()
@@ -121,8 +124,10 @@ final class ShowsListInteractor: ShowsListPresentingListener {
                         // TODO: Update this logic. The way it is, the paging will also finish in case the API call fails but there was already some data being presented. This decision was taken because the retry politics would be already applied here; this is, if an error is received here, it means the same request was already tried at least three times, so it's not a matter of retrying the same request again. The ideal solution would be to wait some time and than retry; or, also, skip the current page being fetched and going to the next. This is a decision that should be taken awareness of all team and PO
                     }
                     self.isPaginating = false
+                    self.presenter?.update(loadingNewPage: false)
                 },
-                receiveValue: { result in
+                receiveValue: { [weak self] result in
+                    guard let self else { return }
                     switch result {
                     case let .shows(shows):
                         self.shows = (self.shows + shows)
@@ -133,6 +138,7 @@ final class ShowsListInteractor: ShowsListPresentingListener {
                         break
                     }
                     self.isPaginating = false
+                    self.presenter?.update(loadingNewPage: false)
                 }
             )
             .store(in: &cancelables)

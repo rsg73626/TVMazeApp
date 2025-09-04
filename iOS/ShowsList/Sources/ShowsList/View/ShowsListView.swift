@@ -15,15 +15,18 @@ fileprivate final class ShowsListViewModel: ObservableObject {
     @Published var title: String
     @Published var shows: [Show]
     @Published var loading: Bool
+    @Published var isPaginating: Bool
     
     init(
         title: String,
         shows: [Show],
-        loading: Bool
+        loading: Bool,
+        isPaginating: Bool
     ) {
         self.title = title
         self.shows = shows
         self.loading = loading
+        self.isPaginating = isPaginating
     }
 }
 
@@ -40,12 +43,14 @@ struct ShowsListView: View {
         title: String,
         shows: [Show] = [],
         loading: Bool = false,
+        isPaginating: Bool = false,
         showViewModelFactory: ShowViewModelFactoring
     ) {
         viewModel = ShowsListViewModel(
             title: title,
             shows: shows,
-            loading: loading
+            loading: loading,
+            isPaginating: isPaginating
         )
         self.showViewModelFactory = showViewModelFactory
     }
@@ -96,14 +101,26 @@ struct ShowsListView: View {
     }
     
     private var listView: some View {
-        List(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
-            ShowView(vm: showViewModelFactory.build(show: show))
-                .onTapGesture {
-                    listener?.didSelect(show: show)
+        List {
+            ForEach(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
+                ShowView(vm: showViewModelFactory.build(show: show))
+                    .onTapGesture {
+                        listener?.didSelect(show: show)
+                    }
+                    .onAppear {
+                        listener?.didShowItemAt(index: index)
+                    }
+            }
+            if viewModel.isPaginating {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text("Loading...")
+                        Spacer()
+                    }
                 }
-                .onAppear {
-                    listener?.didShowItemAt(index: index)
-                }
+                .frame(height: 44)
+            }
         }
         .navigationBarTitleDisplayMode(.large)
         .navigationTitle(viewModel.title)
@@ -126,6 +143,10 @@ extension ShowsListView: @preconcurrency ShowsListPresenting {
     
     func update(title: String) {
         viewModel.title = title
+    }
+    
+    func update(loadingNewPage value: Bool) {
+        viewModel.isPaginating = value
     }
 
 }
