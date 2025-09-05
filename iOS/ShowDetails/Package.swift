@@ -37,7 +37,11 @@ let package = Package(
         .testTarget(
             name: "ShowDetailsTests",
             dependencies: [
-                "ShowDetails"
+                .product(name: "Domain", package: "Domain"),
+                .product(name: "ServiceAPI", package: "Service"),
+                .product(name: "ServiceAPIMocks", package: "Service"),
+                "ShowDetails",
+                "ShowDetailsAPI"
             ]
         ),
     ]
