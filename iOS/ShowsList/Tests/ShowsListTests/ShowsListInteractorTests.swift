@@ -14,6 +14,8 @@ final class ShowsListInteractorTests: XCTestCase {
     private var interactor: ShowsListInteractor!
     
     override func setUp() {
+        super.setUp()
+        
         presenter = ShowsListPresentingMock()
         router = ShowsListRoutingMock()
         service = ShowsServicingMock()
