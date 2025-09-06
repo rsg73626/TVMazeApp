@@ -26,15 +26,18 @@ final class ShowDetailsInteractor: ShowDetailsPresentingListener {
     let show: Show
     let showsService: ShowsServicing
     let imageLoader: ShowDetailsImageLoading
+    let textFormatter: TextFormatting
     
     init(
         show: Show,
         showsService: ShowsServicing,
-        imageLoader: ShowDetailsImageLoading
+        imageLoader: ShowDetailsImageLoading,
+        textFormatter: TextFormatting = TextFormatter()
     ) {
         self.show = show
         self.showsService = showsService
         self.imageLoader = imageLoader
+        self.textFormatter = textFormatter
     }
     
     // MARK: - ShowDetailsPresentingListener
@@ -57,49 +60,16 @@ final class ShowDetailsInteractor: ShowDetailsPresentingListener {
         } else {
             presenter?.update(year: nil)
         }
-        presenter?.update(genres: show.genres.joined(separator: ", ") + ".")
-        presenter?.update(summary: .init(html: show.summary)?.removingFonts() ?? .init(""))
+        if !show.genres.isEmpty {
+            presenter?.update(genres: show.genres.joined(separator: ", ") + ".")
+        } else {
+            presenter?.update(genres: "")
+        }
+        presenter?.update(summary: textFormatter.summary(for: show))
     }
     
     // MARK: - Private
     
     private var cancellables = Set<AnyCancellable>()
     
-}
-
-extension AttributedString {
-    
-    init?(html: String) {
-        let htmlBase = """
-        <style>
-        body { font: -apple-system-body; font-size: 17px; }
-        p { margin: 0 0 8px; }
-        </style>
-        """
-        let html = htmlBase + html
-        guard let data = html.data(using: .utf8) else { return nil }
-        do {
-            let ns = try NSAttributedString(
-                data: data,
-                options: [
-                    .documentType: NSAttributedString.DocumentType.html,
-                    .characterEncoding: String.Encoding.utf8.rawValue
-                ],
-                documentAttributes: nil
-            )
-            self = AttributedString(ns)
-        } catch {
-            return nil
-        }
-    }
-    
-    func removingFonts() -> AttributedString {
-        var copy = self
-        for run in copy.runs {
-            if run.attributes.font != nil {
-                copy[run.range].font = nil
-            }
-        }
-        return copy
-    }
 }
