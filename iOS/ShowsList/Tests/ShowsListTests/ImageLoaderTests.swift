@@ -50,6 +50,7 @@ final class ImageLoaderTests: XCTestCase {
             let reachedDataFetcher = expectation(description: "reached data fetcher")
             let loadedImage = expectation(description: "loaded image")
             let data = UUID().uuidString.data(using: .utf8)!
+            self.imageLoader = ImageLoader(dataFetcher: dataFetcher, defaultPlaceholder: placeholder)
             var dataToImageCallCount = 0
             dataFetcher.fetchDataHandler = { receivedURL in
                 XCTAssertEqual(urlExp, receivedURL)
@@ -93,7 +94,6 @@ final class ImageLoaderTests: XCTestCase {
             // given
             let reachedDataFetcher = expectation(description: "reached data fetcher")
             let loadedImage = expectation(description: "loaded image")
-            var dataToImageCallCount = 0
             dataFetcher.fetchDataHandler = { receivedURL in
                 XCTAssertEqual(urlExp, receivedURL)
                 reachedDataFetcher.fulfill()
@@ -101,7 +101,7 @@ final class ImageLoaderTests: XCTestCase {
                     .eraseToAnyPublisher()
             }
             imageLoader.dataToImage = { receivedData in
-                dataToImageCallCount += 1
+                XCTFail()
                 return self.placeholder
             }
             dataFetcher.fetchDataCallCount = 0
@@ -115,7 +115,6 @@ final class ImageLoaderTests: XCTestCase {
             // verify
             wait(for: [reachedDataFetcher, loadedImage], timeout: 1)
             XCTAssertEqual(1, dataFetcher.fetchDataCallCount)
-            XCTAssertEqual(0, dataToImageCallCount)
         }
     }
     
@@ -160,6 +159,38 @@ final class ImageLoaderTests: XCTestCase {
         
         // verify
         XCTAssertEqual(0, dataFetcher.fetchDataCallCount)
+    }
+    
+    func test_image_cashesValueInMemory() {
+        // given
+        let reachedDataFetcher = expectation(description: "reached data fetcher")
+        let loadedImage = expectation(description: "loaded image")
+        var dataToImageCallCount = 0
+        let urlExp = URL.medium
+        let show = self.show(image: .init(medium: urlExp, original: nil))
+        dataFetcher.fetchDataHandler = { receivedURL in
+            XCTAssertEqual(urlExp, receivedURL)
+            reachedDataFetcher.fulfill()
+            return Just(Data())
+                .setFailureType(to: Error.self)
+                .eraseToAnyPublisher()
+        }
+        imageLoader.dataToImage = { receivedData in
+            dataToImageCallCount += 1
+            return self.placeholder
+        }
+        dataFetcher.fetchDataCallCount = 0
+        reachedDataFetcher.expectedFulfillmentCount = 1
+        loadedImage.expectedFulfillmentCount = 2
+        
+        // when
+        assertImagedLoadedFor(show: show, loadedImageExpectation: loadedImage)
+        assertImagedLoadedFor(show: show, loadedImageExpectation: loadedImage)
+        
+        // verify
+        wait(for: [reachedDataFetcher, loadedImage], timeout: 1)
+        XCTAssertEqual(1, dataFetcher.fetchDataCallCount)
+        XCTAssertEqual(1, dataToImageCallCount)
     }
     
     // MARK: - Helpers

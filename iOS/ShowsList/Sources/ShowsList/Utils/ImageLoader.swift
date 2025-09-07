@@ -43,6 +43,8 @@ final class ImageLoader: ImageLoading {
     
     // MARK: Private
     
+    private var inMemoryCache: [URL: UIImage] = [:]
+    
     private var placeholder: AnyPublisher<UIImage, Never> {
         Just(defaultPlaceholder)
             .eraseToAnyPublisher()
@@ -52,14 +54,19 @@ final class ImageLoader: ImageLoading {
         _ url: URL,
         onFailure: @escaping @autoclosure () -> AnyPublisher<UIImage, Never>
     ) -> AnyPublisher<UIImage, Never> {
-        dataFetcher
+        if let cachedImage = inMemoryCache[url] {
+            return Just(cachedImage)
+                .eraseToAnyPublisher()
+        }
+        return dataFetcher
             .fetchData(for: url)
-            .map { [dataToImage] data in
-                if let image = dataToImage(data) {
-                    Just(image)
+            .map { [weak self] data in
+                if let image = self?.dataToImage(data) {
+                    self?.inMemoryCache[url] = image
+                    return Just(image)
                         .eraseToAnyPublisher()
                 } else {
-                    onFailure()
+                    return onFailure()
                 }
             }
             .switchToLatest()
