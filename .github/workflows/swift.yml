@@ -1,6 +1,7 @@
 # This workflow will build a Swift project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-swift
 
+# .github/workflows/ios-module-tests.yml
 name: iOS Module Tests
 
 on:
@@ -8,16 +9,25 @@ on:
     branches: [ main, develop, 'feature/**' ]
   pull_request:
 
+concurrency:
+  group: ios-module-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
-    # Use runners de macOS (Apple Silicon) estáveis
-    runs-on: macos-14
-    timeout-minutes: 5
+    name: Test ${{ matrix.scheme }}
+    runs-on: macos-15  # macOS com Xcode 16
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
       matrix:
         scheme: [ "ShowsList", "ShowDetails" ]
+
+    env:
+      WORKSPACE: TVMazeApp.xcworkspace
+      DERIVED_DATA: ${{ runner.temp }}/DerivedData
+      DESTINATION: 'platform=iOS Simulator,name=iPhone 15,OS=latest'
 
     steps:
       - name: Checkout
@@ -28,56 +38,61 @@ jobs:
         with:
           xcode-version: '16'
 
-      # ⚠️ Não cacheie DerivedData. Só o cache do SwiftPM.
-      - name: Cache SwiftPM
+      - name: Cache SPM
         uses: actions/cache@v4
         with:
-          path: ~/Library/Caches/org.swift.swiftpm
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: ${{ runner.os }}-spm-
+          restore-keys: |
+            ${{ runner.os }}-spm-
 
-      - name: Resolve Swift Packages
-        run: xcodebuild -resolvePackageDependencies -workspace TVMazeApp.xcworkspace
-
-      # --- Higieniza simuladores e cria um limpo e previsível ---
-      - name: Prepare Simulator
+      - name: Resolve SPM deps
         run: |
-          set -euxo pipefail
-          # Fecha e apaga tudo para evitar zumbi
-          xcrun simctl shutdown all || true
-          xcrun simctl erase all || true
+          xcodebuild -resolvePackageDependencies \
+            -workspace "$WORKSPACE"
 
-          # Escolha um runtime/DEVICE estáveis
-          RUNTIME=$(xcrun simctl list runtimes | awk -F '[()]' '/iOS .*18/{print $2; exit}')
-          DEVICE_NAME="CI-iPhone-16"
-          xcrun simctl create "$DEVICE_NAME" "iPhone 16" "$RUNTIME"
-          xcrun simctl boot "$DEVICE_NAME"
-          xcrun simctl bootstatus "$DEVICE_NAME" -b  # espera boot completo
-
-      - name: Run unit tests (${{ matrix.scheme }})
-        env:
-          NSUnbufferedIO: "YES"
+      - name: Show available schemes (debug)
         run: |
-          set -euxo pipefail
+          xcodebuild -list -workspace "$WORKSPACE"
 
-          DESTINATION="platform=iOS Simulator,name=CI-iPhone-16,OS=18.0"
-
-          # Derive Data isolado por scheme evita sujeira entre matrizes
-          DERIVED_DATA="$PWD/DerivedData/${{ matrix.scheme }}"
-
+      - name: Build ${{ matrix.scheme }}
+        run: |
           xcodebuild \
-            -list \
-            -workspace TVMazeApp.xcworkspace \
+            -workspace "$WORKSPACE" \
             -scheme "${{ matrix.scheme }}" \
             -destination "$DESTINATION" \
             -derivedDataPath "$DERIVED_DATA" \
-            -parallel-testing-enabled NO \
-            -resultBundlePath "TestResults/${{ matrix.scheme }}.xcresult" \
-            clean test | xcpretty
+            -disableAutomaticPackageResolution \
+            build | xcpretty
+        shell: bash
 
-      - name: Upload .xcresult
+      - name: Test ${{ matrix.scheme }}
+        run: |
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "${{ matrix.scheme }}" \
+            -destination "$DESTINATION" \
+            -derivedDataPath "$DERIVED_DATA" \
+            -enableCodeCoverage YES \
+            -disableAutomaticPackageResolution \
+            test | xcpretty && exit ${PIPESTATUS[0]}
+        shell: bash
+
+      - name: Save test logs (on failure)
+        if: failure()
+        run: |
+          mkdir -p artifacts
+          # Exporta os últimos logs da build/test
+          LOG_DIR="$DERIVED_DATA/Logs/Test"
+          cp -R "$LOG_DIR" artifacts/test-logs || true
+        shell: bash
+
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TestResults-${{ matrix.scheme }}
-          path: TestResults/${{ matrix.scheme }}.xcresult
+          name: test-logs-${{ matrix.scheme }}
+          path: artifacts
+          if-no-files-found: ignore
