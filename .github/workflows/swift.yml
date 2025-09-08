@@ -41,7 +41,8 @@ jobs:
       - name: Resolve SPM deps
         run: |
           xcodebuild -resolvePackageDependencies \
-            -workspace "$WORKSPACE"
+            -workspace "$WORKSPACE" \
+            -scheme "${{ matrix.scheme }}"
 
       - name: Show available schemes (debug)
         run: |
