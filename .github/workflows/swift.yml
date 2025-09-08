@@ -10,45 +10,69 @@ on:
 
 jobs:
   tests:
-    runs-on: ios-18
+    # Use runners de macOS (Apple Silicon) estáveis
+    runs-on: macos-14
+    timeout-minutes: 5
+
     strategy:
       fail-fast: false
       matrix:
         scheme: [ "ShowsList", "ShowDetails" ]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select Xcode 16
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'
+          xcode-version: '16'
 
-      - name: Cache SPM
+      # ⚠️ Não cacheie DerivedData. Só o cache do SwiftPM.
+      - name: Cache SwiftPM
         uses: actions/cache@v4
         with:
-          path: |
-            ~/Library/Developer/Xcode/DerivedData
-            ~/Library/Caches/org.swift.swiftpm
+          path: ~/Library/Caches/org.swift.swiftpm
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
+          restore-keys: ${{ runner.os }}-spm-
 
       - name: Resolve Swift Packages
+        run: xcodebuild -resolvePackageDependencies -workspace TVMazeApp.xcworkspace
+
+      # --- Higieniza simuladores e cria um limpo e previsível ---
+      - name: Prepare Simulator
         run: |
-          xcodebuild -resolvePackageDependencies -workspace TVMazeApp.xcworkspace
+          set -euxo pipefail
+          # Fecha e apaga tudo para evitar zumbi
+          xcrun simctl shutdown all || true
+          xcrun simctl erase all || true
+
+          # Escolha um runtime/DEVICE estáveis
+          RUNTIME=$(xcrun simctl list runtimes | awk -F '[()]' '/iOS .*18/{print $2; exit}')
+          DEVICE_NAME="CI-iPhone-16"
+          xcrun simctl create "$DEVICE_NAME" "iPhone 16" "$RUNTIME"
+          xcrun simctl boot "$DEVICE_NAME"
+          xcrun simctl bootstatus "$DEVICE_NAME" -b  # espera boot completo
 
       - name: Run unit tests (${{ matrix.scheme }})
+        env:
+          NSUnbufferedIO: "YES"
         run: |
-          set -o pipefail
+          set -euxo pipefail
+
+          DESTINATION="platform=iOS Simulator,name=CI-iPhone-16,OS=18.0"
+
+          # Derive Data isolado por scheme evita sujeira entre matrizes
+          DERIVED_DATA="$PWD/DerivedData/${{ matrix.scheme }}"
+
           xcodebuild \
             -workspace TVMazeApp.xcworkspace \
             -scheme "${{ matrix.scheme }}" \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -resultBundlePath TestResults/${{ matrix.scheme }}.xcresult \
-            clean test
-        env:
-          NSUnbufferedIO: "YES"
+            -destination "$DESTINATION" \
+            -derivedDataPath "$DERIVED_DATA" \
+            -parallel-testing-enabled NO \
+            -resultBundlePath "TestResults/${{ matrix.scheme }}.xcresult" \
+            clean test | xcpretty
 
       - name: Upload .xcresult
         if: always()
@@ -56,4 +80,3 @@ jobs:
         with:
           name: TestResults-${{ matrix.scheme }}
           path: TestResults/${{ matrix.scheme }}.xcresult
-
