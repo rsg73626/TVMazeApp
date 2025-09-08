@@ -105,7 +105,9 @@ struct ShowsListView: View {
             Spacer()
             HStack {
                 Spacer()
-                Text("Loading...")
+                Text(
+                    localized("list.loading")
+                )
                 Spacer()
             }
             Spacer()
@@ -115,11 +117,14 @@ struct ShowsListView: View {
     private var retryView: some View {
         VStack {
             Spacer()
-            Text("Ops..")
-            Text("Something went wrong...")
+            Text(localized("ops"))
+                .bold()
+            Spacer()
+            Text(localized("genericError"))
+            Text(localized("tryAgain"))
             Spacer()
             Button(action: { listener?.didPressRetryButton() }) {
-                Text("Retry")
+                Text(localized("retry"))
             }
             Spacer()
         }
@@ -146,7 +151,9 @@ struct ShowsListView: View {
                 VStack {
                     HStack {
                         Spacer()
-                        Text("Loading...")
+                        Text(
+                            localized("list.paginating")
+                        )
                         Spacer()
                     }
                 }
@@ -172,7 +179,9 @@ struct ShowsListView: View {
                     VStack {
                         HStack {
                             Spacer()
-                            Text("Loading...")
+                            Text(
+                                localized("list.paginating")
+                            )
                             Spacer()
                         }
                     }

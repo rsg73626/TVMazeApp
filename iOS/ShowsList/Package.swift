@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "ShowsList",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v18)
     ],
@@ -34,6 +35,9 @@ let package = Package(
                 .product(name: "ShowDetails", package: "ShowDetails"),
                 .product(name: "ShowDetailsAPI", package: "ShowDetails"),
                 "ShowsListAPI"
+            ],
+            resources: [
+                .process("Resources")
             ]
         ),
         .testTarget(
