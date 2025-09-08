@@ -66,6 +66,7 @@ jobs:
           DERIVED_DATA="$PWD/DerivedData/${{ matrix.scheme }}"
 
           xcodebuild \
+            -list \
             -workspace TVMazeApp.xcworkspace \
             -scheme "${{ matrix.scheme }}" \
             -destination "$DESTINATION" \
