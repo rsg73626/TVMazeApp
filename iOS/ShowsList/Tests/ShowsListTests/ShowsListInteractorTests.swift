@@ -14,6 +14,8 @@ final class ShowsListInteractorTests: XCTestCase {
     private var interactor: ShowsListInteractor!
     
     override func setUp() {
+        super.setUp()
+        
         presenter = ShowsListPresentingMock()
         router = ShowsListRoutingMock()
         service = ShowsServicingMock()
@@ -178,6 +180,19 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         XCTAssertEqual(1, router.showDetailsCallCount)
+    }
+    
+    func test_retry_showsLoading_callsService() {
+        // given
+        presenter.showLoadingCallCount = 0
+        service.showsCallCount = 0
+        
+        // when
+        interactor.didPressRetryButton()
+        
+        // verify
+        XCTAssertEqual(1, presenter.showLoadingCallCount)
+        XCTAssertEqual(1, service.showsCallCount)
     }
     
     // MARK: - Pagination tests
