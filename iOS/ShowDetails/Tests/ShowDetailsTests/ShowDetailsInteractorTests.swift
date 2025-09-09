@@ -14,7 +14,6 @@ final class ShowDetailsTests: XCTestCase {
     private var presenter: ShowDetailsPresentingMock!
     private var service: ShowsServicingMock!
     private var imageLoader: ShowDetailsImageLoadingMock!
-    private var textFormatter: TextFormattingMock!
     private var aShow: Show!
     private var interactor: ShowDetailsInteractor!
     
@@ -24,13 +23,12 @@ final class ShowDetailsTests: XCTestCase {
         presenter = ShowDetailsPresentingMock()
         service = ShowsServicingMock()
         imageLoader = ShowDetailsImageLoadingMock()
-        textFormatter = TextFormattingMock()
         aShow = show()
         interactor = ShowDetailsInteractor(
+            presenter: presenter,
             show: aShow,
             showsService: service,
-            imageLoader: imageLoader,
-            textFormatter: textFormatter
+            imageLoader: imageLoader
         )
         interactor.presenter = presenter
         imageLoader.imageHandler = { receivedShow in
@@ -38,11 +36,6 @@ final class ShowDetailsTests: XCTestCase {
             
             return PassthroughSubject<UIImage, Never>()
                 .eraseToAnyPublisher()
-        }
-        textFormatter.summaryHandler = { receivedShow in
-            XCTAssertIdentical(self.aShow, receivedShow)
-            
-            return AttributedString(stringLiteral: "test-summary")
         }
     }
     
@@ -71,7 +64,7 @@ final class ShowDetailsTests: XCTestCase {
         XCTAssertEqual(1, imageLoader.imageCallCount)
     }
     
-    func test_viewDidLoad_imageLoaded_updagesImageOnPresenter() {
+    func test_viewDidLoad_imageLoaded_updatesImageOnPresenter() {
         // given
         let image = UIImage()
         let imageLoadingExp = expectation(description: "set image loading")
@@ -104,100 +97,18 @@ final class ShowDetailsTests: XCTestCase {
         
     }
     
-    func test_viewDidLoad_updatesTitle() {
+    func test_viewDidLoad_updatesShow() {
         // given
-        presenter.updateTitleHandler = { receivedTitle in
-            XCTAssertEqual(self.aShow.name, receivedTitle)
-        }
-        presenter.updateTitleCallCount = 0
-        
-        // when
-        interactor.viewDidLoad()
-        
-        // verify
-        XCTAssertEqual(1, presenter.updateTitleCallCount)
-    }
-    
-    func test_viewDidLoad_showWithoutYearProperty_updatesYearWithNull() {
-        // given
-        updateSUT(show: show(year: nil))
-        presenter.updateYearHandler = { receivedYear in
-            XCTAssertNil(receivedYear)
-        }
-        presenter.updateYearCallCount = 0
-        
-        // when
-        interactor.viewDidLoad()
-        
-        // verify
-        XCTAssertEqual(1, presenter.updateYearCallCount)
-    }
-    
-    func test_viewDidLoad_showWithYearProperty_updatesYearWithValue() {
-        // given
-        updateSUT(show: show(year: 2000))
-        presenter.updateYearHandler = { receivedYear in
-            XCTAssertEqual("2000", receivedYear)
-        }
-        presenter.updateYearCallCount = 0
-        
-        // when
-        interactor.viewDidLoad()
-        
-        // verify
-        XCTAssertEqual(1, presenter.updateYearCallCount)
-    }
-    
-    func test_viewDidLoad_showWithEmptyGenresList_updatesGenresWithEmptyString() {
-        // given
-        updateSUT(show: show(genres: []))
-        presenter.updateGenresHandler = { receivedGenres in
-            XCTAssertEqual("", receivedGenres)
-        }
-        presenter.updateGenresCallCount = 0
-        
-        // when
-        interactor.viewDidLoad()
-        
-        // verify
-        XCTAssertEqual(1, presenter.updateGenresCallCount)
-    }
-    
-    func test_viewDidLoad_showWithGenresProperty_updatesGenresWithValue() {
-        // given
-        let genres = ["Action", "Adventure", "Animation"]
-        let expectedGenresValue = "Action, Adventure, Animation."
-        updateSUT(show: show(genres: genres))
-        presenter.updateGenresHandler = { receivedGenres in
-            XCTAssertEqual(expectedGenresValue, receivedGenres)
-        }
-        presenter.updateGenresCallCount = 0
-        
-        // when
-        interactor.viewDidLoad()
-        
-        // verify
-        XCTAssertEqual(1, presenter.updateGenresCallCount)
-    }
-    
-    func test_viewDidLoad_callsTextFormatter_updatesSummaryWithCorrectValue() {
-        // given
-        let expectedSummaryValue = AttributedString(stringLiteral: "test-summary")
-        textFormatter.summaryHandler = { receivedShow in
+        presenter.updateShowHandler = { receivedShow in
             XCTAssertIdentical(self.aShow, receivedShow)
-            return expectedSummaryValue
         }
-        presenter.updateSummaryHandler = { receivedSummary in
-            XCTAssertEqual(expectedSummaryValue, receivedSummary)
-        }
-        textFormatter.summaryCallCount = 0
-        presenter.updateSummaryCallCount = 0
+        presenter.updateShowsCallCount = 0
         
         // when
         interactor.viewDidLoad()
         
         // verify
-        XCTAssertEqual(1, presenter.updateSummaryCallCount)
+        XCTAssertEqual(1, presenter.updateShowsCallCount)
     }
     
     // MARK: - Private
@@ -227,10 +138,10 @@ final class ShowDetailsTests: XCTestCase {
     private func updateSUT(show: Show) {
         aShow = show
         interactor = ShowDetailsInteractor(
+            presenter: presenter,
             show: aShow,
             showsService: service,
-            imageLoader: imageLoader,
-            textFormatter: textFormatter
+            imageLoader: imageLoader
         )
         interactor.presenter = presenter
     }
