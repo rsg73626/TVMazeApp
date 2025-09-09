@@ -1,0 +1,14 @@
+//
+//  Localizable.strings
+//  ShowsList
+//
+//  Created by Renan Germano on 08/09/25.
+//
+
+"ops" = "Ops.";
+"genericError" = "Something went wrong.";
+"tryAgain" = "Please, try again in a few moments.";
+"retry" = "Retry";
+
+"list.loading" = "Loading...";
+"list.paginating" = "Loading...";

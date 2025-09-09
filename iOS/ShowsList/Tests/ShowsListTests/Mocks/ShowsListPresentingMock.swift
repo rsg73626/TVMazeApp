@@ -10,38 +10,31 @@ import Domain
 
 final class ShowsListPresentingMock: ShowsListPresenting {
     
-    var showLoadingCallCount = 0
-    var hideLoadingCallCount = 0
-    var updateListCallCount = 0
     var updateTitleCallCount = 0
+    var updateLoadingCallCount = 0
+    var updateShowsCallCount = 0
     var updateLoadingNewPageCallCount = 0
     
-    var showLoadingHandler: (() -> Void)?
-    var hideLoadingHandler: (() -> Void)?
-    var updateListHandler: (([Show]) -> Void)?
-    var updateTitleHandler: ((String) -> Void)?
+    var updateTitleHandler: (() -> Void)?
+    var updateLoadingHandler: ((Bool) -> Void)?
+    var updateShowsHandler: (([Show]) -> Void)?
     var updateLoadingNewPageHandler: ((Bool) -> Void)?
     
     init() { }
-
-    func showLoading() {
-        showLoadingCallCount += 1
-        showLoadingHandler?()
-    }
     
-    func hideLoading() {
-        hideLoadingCallCount += 1
-        hideLoadingHandler?()
-    }
-    
-    func update(list: [Show]) {
-        updateListCallCount += 1
-        updateListHandler?(list)
-    }
-    
-    func update(title: String) {
+    func updateTitle() {
         updateTitleCallCount += 1
-        updateTitleHandler?(title)
+        updateTitleHandler?()
+    }
+
+    func update(loading: Bool) {
+        updateLoadingCallCount += 1
+        updateLoadingHandler?(loading)
+    }
+    
+    func update(shows: [Show]) {
+        updateShowsCallCount += 1
+        updateShowsHandler?(shows)
     }
     
     func update(loadingNewPage value: Bool) {

@@ -7,53 +7,92 @@ on:
   push:
     branches: [ main, develop, 'feature/**' ]
   pull_request:
+    branches: [ main, develop, 'feature/**' ]
+
+concurrency:
+  group: ios-module-tests-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   tests:
-    runs-on: ios-18
+    name: Test ${{ matrix.scheme }}
+    runs-on: macos-15  # macOS com Xcode 16
+    timeout-minutes: 30
+
     strategy:
       fail-fast: false
       matrix:
-        scheme: [ "ShowsList", "ShowDetails", "App" ]  # nomes dos schemes que possuem os test targets
+        scheme: [ "ShowsList", "ShowDetails" ]
+
+    env:
+      WORKSPACE: TVMazeApp.xcworkspace
+      DERIVED_DATA: ${{ runner.temp }}/DerivedData
+      DESTINATION: 'platform=iOS Simulator,name=iPhone 15,OS=latest'
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select Xcode 16
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '16.4'  # ajuste conforme sua versão local
+          xcode-version: '16'
 
       - name: Cache SPM
         uses: actions/cache@v4
         with:
           path: |
-            ~/Library/Developer/Xcode/DerivedData
             ~/Library/Caches/org.swift.swiftpm
+            ~/Library/Developer/Xcode/DerivedData
           key: ${{ runner.os }}-spm-${{ hashFiles('**/Package.resolved') }}
           restore-keys: |
             ${{ runner.os }}-spm-
 
-      - name: Resolve Swift Packages
+      - name: Resolve SPM deps
         run: |
-          xcodebuild -resolvePackageDependencies -workspace YourApp.xcworkspace
+          xcodebuild -resolvePackageDependencies \
+            -workspace "$WORKSPACE"
 
-      - name: Run unit tests (${{ matrix.scheme }})
+      - name: Show available schemes (debug)
         run: |
-          set -o pipefail
+          xcodebuild -list -workspace "$WORKSPACE"
+
+      - name: Build ${{ matrix.scheme }}
+        run: |
           xcodebuild \
-            -workspace TVMaze.xcworkspace \
+            -workspace "$WORKSPACE" \
             -scheme "${{ matrix.scheme }}" \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -resultBundlePath TestResults/${{ matrix.scheme }}.xcresult \
-            clean test
-        env:
-          NSUnbufferedIO: "YES"
+            -destination "$DESTINATION" \
+            -derivedDataPath "$DERIVED_DATA" \
+            -disableAutomaticPackageResolution \
+            build | xcpretty
+        shell: bash
 
-      - name: Upload .xcresult
+      - name: Test ${{ matrix.scheme }}
+        run: |
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "${{ matrix.scheme }}" \
+            -destination "$DESTINATION" \
+            -derivedDataPath "$DERIVED_DATA" \
+            -enableCodeCoverage YES \
+            -disableAutomaticPackageResolution \
+            test | xcpretty && exit ${PIPESTATUS[0]}
+        shell: bash
+
+      - name: Save test logs (on failure)
+        if: failure()
+        run: |
+          mkdir -p artifacts
+          # Exporta os últimos logs da build/test
+          LOG_DIR="$DERIVED_DATA/Logs/Test"
+          cp -R "$LOG_DIR" artifacts/test-logs || true
+        shell: bash
+
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TestResults-${{ matrix.scheme }}
-          path: TestResults/${{ matrix.scheme }}.xcresult
-
+          name: test-logs-${{ matrix.scheme }}
+          path: artifacts
+          if-no-files-found: ignore

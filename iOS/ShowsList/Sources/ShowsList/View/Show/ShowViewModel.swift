@@ -9,24 +9,6 @@ import Combine
 import Domain
 import SwiftUI
 
-protocol ShowViewModelFactoring {
-    func build(show: Show) -> ShowViewModel
-}
-
-final class ShowViewModelFactory: ShowViewModelFactoring {
-    
-    let imageLoader: ImageLoading
-    
-    init(imageLoader: ImageLoading) {
-        self.imageLoader = imageLoader
-    }
-    
-    func build(show: Show) -> ShowViewModel {
-        ShowViewModel(show: show, imageLoader: imageLoader)
-    }
-
-}
-
 final class ShowViewModel: ObservableObject, Identifiable {
     let id: UUID
     @Published private(set) var name: String
