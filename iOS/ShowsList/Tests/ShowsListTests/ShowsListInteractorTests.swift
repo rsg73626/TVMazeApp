@@ -20,11 +20,10 @@ final class ShowsListInteractorTests: XCTestCase {
         router = ShowsListRoutingMock()
         service = ShowsServicingMock()
         interactor = ShowsListInteractor(
+            presenter: presenter,
             router: router,
             showsService: service
         )
-        
-        interactor.presenter = presenter
         
         service.showsHandler = { _ in
             Just(ShowsResult.didFinish)
@@ -35,13 +34,14 @@ final class ShowsListInteractorTests: XCTestCase {
     
     func test_viewDidLoad_showsLoading() {
         // given
-        presenter.showLoadingCallCount = 0
+        presenter.updateLoadingHandler = { XCTAssertTrue($0) }
+        presenter.updateLoadingCallCount = 0
         
         // when
         interactor.viewDidLoad()
         
         // verify
-        XCTAssertEqual(1, presenter.showLoadingCallCount)
+        XCTAssertEqual(1, presenter.updateLoadingCallCount)
     }
     
     func test_viewDidLoad_callsService_shows() {
@@ -59,10 +59,12 @@ final class ShowsListInteractorTests: XCTestCase {
         // given
         let exp = expectation(description: "hide loading")
         service_shows_error()
-        presenter.hideLoadingHandler = {
-            exp.fulfill()
+        presenter.updateLoadingHandler = { receivedValue in
+            if !receivedValue {
+                exp.fulfill()
+            }
         }
-        presenter.hideLoadingCallCount = 0
+        presenter.updateLoadingCallCount = 0
         
         // when
         interactor.viewDidLoad()
@@ -70,17 +72,19 @@ final class ShowsListInteractorTests: XCTestCase {
         // verify
         wait(for: [exp], timeout: 1)
         XCTAssertEqual(1, service.showsCallCount)
-        XCTAssertEqual(1, presenter.hideLoadingCallCount)
+        XCTAssertEqual(2, presenter.updateLoadingCallCount)
     }
     
     func test_viewDidLoad_serviceSuccess_didFinish_hidesLoading() {
         // given
         let exp = expectation(description: "hide loading")
         service_shows_success(result: .didFinish)
-        presenter.hideLoadingHandler = {
-            exp.fulfill()
+        presenter.updateLoadingHandler = { receivedValue in
+            if !receivedValue {
+                exp.fulfill()
+            }
         }
-        presenter.hideLoadingCallCount = 0
+        presenter.updateLoadingCallCount = 0
         
         // when
         interactor.viewDidLoad()
@@ -88,17 +92,19 @@ final class ShowsListInteractorTests: XCTestCase {
         // verify
         wait(for: [exp], timeout: 1)
         XCTAssertEqual(1, service.showsCallCount)
-        XCTAssertEqual(1, presenter.hideLoadingCallCount)
+        XCTAssertEqual(2, presenter.updateLoadingCallCount)
     }
     
     func test_viewDidLoad_serviceSuccess_shows_hidesLoading() {
         // given
         let exp = expectation(description: "hide loading")
         service_shows_success(result: .shows([]))
-        presenter.hideLoadingHandler = {
-            exp.fulfill()
+        presenter.updateLoadingHandler = { receivedValue in
+            if !receivedValue {
+                exp.fulfill()
+            }
         }
-        presenter.hideLoadingCallCount = 0
+        presenter.updateLoadingCallCount = 0
         
         // when
         interactor.viewDidLoad()
@@ -106,18 +112,18 @@ final class ShowsListInteractorTests: XCTestCase {
         // verify
         wait(for: [exp], timeout: 1)
         XCTAssertEqual(1, service.showsCallCount)
-        XCTAssertEqual(1, presenter.hideLoadingCallCount)
+        XCTAssertEqual(2, presenter.updateLoadingCallCount)
     }
     
     func test_viewDidLoad_serviceFailure_callsPresenter_updateList_withEmptyList() {
         // given
         let exp = expectation(description: "presenter call with empty list")
         service_shows_error()
-        presenter.updateListHandler = { shows in
+        presenter.updateShowsHandler = { shows in
             XCTAssertTrue(shows.isEmpty)
             exp.fulfill()
         }
-        presenter.updateListCallCount = 0
+        presenter.updateShowsCallCount = 0
         
         // when
         interactor.viewDidLoad()
@@ -125,18 +131,18 @@ final class ShowsListInteractorTests: XCTestCase {
         // verify
         wait(for: [exp], timeout: 1)
         XCTAssertEqual(1, service.showsCallCount)
-        XCTAssertEqual(1, presenter.updateListCallCount)
+        XCTAssertEqual(1, presenter.updateShowsCallCount)
     }
     
     func test_viewDidLoad_serviceSuccess_didFinish_callsPresenter_updateList_withEmptyList() {
         // given
         let exp = expectation(description: "presenter call with empty list")
         service_shows_success(result: .didFinish)
-        presenter.updateListHandler = { shows in
+        presenter.updateShowsHandler = { shows in
             XCTAssertTrue(shows.isEmpty)
             exp.fulfill()
         }
-        presenter.updateListCallCount = 0
+        presenter.updateShowsCallCount = 0
         
         // when
         interactor.viewDidLoad()
@@ -144,7 +150,7 @@ final class ShowsListInteractorTests: XCTestCase {
         // verify
         wait(for: [exp], timeout: 1)
         XCTAssertEqual(1, service.showsCallCount)
-        XCTAssertEqual(1, presenter.updateListCallCount)
+        XCTAssertEqual(1, presenter.updateShowsCallCount)
     }
     
     func test_viewDidLoad_serviceSuccess_shows_callsPresenter_updateList_withShows() {
@@ -152,11 +158,11 @@ final class ShowsListInteractorTests: XCTestCase {
         let exp = expectation(description: "presenter call with shows")
         let shows = [show(), show(), show()]
         service_shows_success(result: .shows(shows))
-        presenter.updateListHandler = { receivedShows in
+        presenter.updateShowsHandler = { receivedShows in
             XCTAssertEqual(shows, receivedShows)
             exp.fulfill()
         }
-        presenter.updateListCallCount = 0
+        presenter.updateShowsCallCount = 0
         
         // when
         interactor.viewDidLoad()
@@ -164,7 +170,7 @@ final class ShowsListInteractorTests: XCTestCase {
         // verify
         wait(for: [exp], timeout: 1)
         XCTAssertEqual(1, service.showsCallCount)
-        XCTAssertEqual(1, presenter.updateListCallCount)
+        XCTAssertEqual(1, presenter.updateShowsCallCount)
     }
     
     func test_didSelect_routesToDetails() {
@@ -184,14 +190,14 @@ final class ShowsListInteractorTests: XCTestCase {
     
     func test_retry_showsLoading_callsService() {
         // given
-        presenter.showLoadingCallCount = 0
+        presenter.updateLoadingCallCount = 0
         service.showsCallCount = 0
         
         // when
         interactor.didPressRetryButton()
         
         // verify
-        XCTAssertEqual(1, presenter.showLoadingCallCount)
+        XCTAssertEqual(1, presenter.updateLoadingCallCount)
         XCTAssertEqual(1, service.showsCallCount)
     }
     
@@ -218,7 +224,7 @@ final class ShowsListInteractorTests: XCTestCase {
         let exp = expectation(description: "pagination")
         let newPage = [show(), show(), show()]
         service_shows_success(result: .shows(newPage), expectedPage: 1)
-        presenter.updateListHandler = { receivedShows in
+        presenter.updateShowsHandler = { receivedShows in
             XCTAssertEqual(firstPage + newPage, receivedShows)
             exp.fulfill()
         }
@@ -369,23 +375,26 @@ final class ShowsListInteractorTests: XCTestCase {
         let hideLoadingExp = expectation(description: "presenter hide loading")
         let shows = (1...count).map { _ in show() }
         service_shows_success(result: .shows(shows), file: file, line: line)
-        presenter.updateListHandler = { receivedShows in
+        presenter.updateShowsHandler = { receivedShows in
             XCTAssertEqual(shows, receivedShows, file: file, line: line)
             updateListExp.fulfill()
         }
-        presenter.hideLoadingHandler = {
-            hideLoadingExp.fulfill()
+        presenter.updateLoadingHandler = { receivedValue in
+            if receivedValue {
+                // no-op
+            } else {
+                hideLoadingExp.fulfill()
+            }
         }
-        presenter.updateListCallCount = 0
-        presenter.showLoadingCallCount = 0
-        presenter.hideLoadingCallCount = 0
+        presenter.updateShowsCallCount = 0
+        presenter.updateLoadingCallCount = 0
         
         // when
         interactor.viewDidLoad()
         
         // verify
-        XCTAssertEqual(1, presenter.showLoadingCallCount)
         wait(for: [hideLoadingExp, updateListExp], timeout: 1)
+        XCTAssertEqual(2, presenter.updateLoadingCallCount)
         return shows
     }
     
@@ -405,7 +414,7 @@ final class ShowsListInteractorTests: XCTestCase {
             file: file,
             line: line
         )
-        presenter.updateListHandler = { receivedShows in
+        presenter.updateShowsHandler = { receivedShows in
             XCTAssertEqual(currentList + newPage, receivedShows, file: file, line: line)
             exp.fulfill()
         }

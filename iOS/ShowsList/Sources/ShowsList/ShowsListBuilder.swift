@@ -20,20 +20,27 @@ public final class ShowsListBuilder: @preconcurrency ShowsListBuilding {
     }
     
     @MainActor public func build() -> UIViewController {
-        let imageLoader = ImageLoader(dataFetcher: dependencies.dataFetcher)
-        let factory = ShowViewModelFactory(imageLoader: imageLoader)
-        let title = "TVMaze" // TODO: Use localized strings
-        var view = ShowsListView(title: title, shows: [], showViewModelFactory: factory)
         let router = ShowsListRouter(showDetailsBuilder: dependencies.showDetailsBuilder)
+        let presenter = ShowsListPresenter(imageLoader: imageLoader())
         let interactor = ShowsListInteractor(
+            presenter: presenter,
             router: router,
             showsService: dependencies.showsService
         )
+        var view = ShowsListView(showViewProvider: presenter)
+        
         view.listener = interactor
-        interactor.presenter = view
+        presenter.view = view
+        
         let viewController = UIHostingController(rootView: view)
         router.viewController = viewController
         return viewController
+    }
+    
+    // MARK: - Private
+    
+    private func imageLoader() -> ImageLoading {
+        ImageLoader(dataFetcher: dependencies.dataFetcher)
     }
 
 }

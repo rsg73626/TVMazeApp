@@ -26,11 +26,11 @@ struct ShowView: View {
         if grid {
             gridView
         } else {
-            nonGridView
+            listView
         }
     }
     
-    private var nonGridView: some View {
+    private var listView: some View {
         HStack(spacing: 12) {
             Group {
                 if let img = viewModel.image {
@@ -88,8 +88,4 @@ struct ShowView: View {
                 .lineLimit(2)
         }
     }
-}
-
-fileprivate extension UIImage {
-    static let placeholder = UIImage() // TODO: replace it with placeholder
 }
