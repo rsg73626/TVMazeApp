@@ -11,10 +11,6 @@ import ServiceAPI
 import SwiftUI
 import ShowsListAPI
 
-protocol ShowViewProviding {
-    func view(for show: Show, isGridLayout: Bool) -> ShowView
-}
-
 struct ShowsListView: View, @preconcurrency ShowsListViewing {
     
     init(showViewProvider: ShowViewProviding) {

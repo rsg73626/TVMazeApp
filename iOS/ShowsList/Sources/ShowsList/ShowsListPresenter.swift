@@ -8,22 +8,6 @@
 import Domain
 import SwiftUI
 
-protocol ShowsListViewing {
-    var listener: ShowsListViewingListening? { get set }
-    
-    func update(loading: Bool)
-    func update(shows: [Show])
-    func update(title: String)
-    func update(loadingNewPage: Bool)
-}
-
-protocol ShowsListViewingListening: AnyObject {
-    func viewDidLoad()
-    func didSelect(show: Show)
-    func didShowItemAt(index: Int)
-    func didPressRetryButton()
-}
-
 @MainActor final class ShowsListPresenter: @preconcurrency ShowsListPresenting,
                                            @preconcurrency ShowViewProviding {
     

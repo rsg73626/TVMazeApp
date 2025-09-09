@@ -11,13 +11,6 @@ import Foundation
 import ServiceAPI
 import ShowsListAPI
 
-protocol ShowsListPresenting {
-    func updateTitle()
-    func update(loading: Bool)
-    func update(shows: [Show])
-    func update(loadingNewPage: Bool)
-}
-
 final class ShowsListInteractor: ShowsListViewingListening {
     
     let presenter: ShowsListPresenting

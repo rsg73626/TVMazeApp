@@ -10,10 +10,6 @@ import ShowDetailsAPI
 import ShowsListAPI
 import UIKit
 
-protocol ShowsListRouting {
-    func showDetails(for show: Show)
-}
-
 final class ShowsListRouter: @preconcurrency ShowsListRouting {
     
     weak var viewController: UIViewController?
