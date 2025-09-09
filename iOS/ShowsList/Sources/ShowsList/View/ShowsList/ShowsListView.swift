@@ -11,62 +11,11 @@ import ServiceAPI
 import SwiftUI
 import ShowsListAPI
 
-fileprivate final class ShowsListViewModel: ObservableObject {
-    @Published var title: String
-    @Published var shows: [Show]
-    @Published var loading: Bool
-    @Published var isPaginating: Bool
+struct ShowsListView: View, @preconcurrency ShowsListViewing {
     
-    init(
-        title: String,
-        shows: [Show],
-        loading: Bool,
-        isPaginating: Bool
-    ) {
-        self.title = title
-        self.shows = shows
-        self.loading = loading
-        self.isPaginating = isPaginating
-    }
-}
-
-fileprivate enum LayoutMode: String, CaseIterable, Identifiable {
-    case list = "Lista"
-    case grid = "Grid"
-    var id: String { rawValue }
-    var icon: String {
-        switch self {
-        case .list: return "list.bullet"
-        case .grid: return "square.grid.2x2"
-        }
-    }
-}
-
-struct ShowsListView: View {
-    
-    var listener: ShowsListPresentingListener?
-    
-    private let showViewModelFactory: ShowViewModelFactoring
-    private let gridColumns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
-    
-    @ObservedObject private var viewModel: ShowsListViewModel
-    @State private var didLoad: Bool = false
-    @State private var layout: LayoutMode = .list
-    
-    init(
-        title: String,
-        shows: [Show] = [],
-        loading: Bool = false,
-        isPaginating: Bool = false,
-        showViewModelFactory: ShowViewModelFactoring
-    ) {
-        viewModel = ShowsListViewModel(
-            title: title,
-            shows: shows,
-            loading: loading,
-            isPaginating: isPaginating
-        )
-        self.showViewModelFactory = showViewModelFactory
+    init(showViewProvider: ShowViewProviding) {
+        viewModel = ShowsListViewModel()
+        self.showViewProvider = showViewProvider
     }
     
     var body: some View {
@@ -88,17 +37,46 @@ struct ShowsListView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 // Picker segmentado com duas opções
-                Picker("Layout", selection: $layout) {
+                Picker(localized("layout"), selection: $layout) {
                     ForEach(LayoutMode.allCases) { m in
                         Label(m.rawValue, systemImage: m.icon).tag(m)
                     }
                 }
                 .pickerStyle(.segmented)
-                .frame(width: 160) // ajuda a caber na direita
-                .accessibilityLabel("Alternar layout")
+                .frame(width: 160)
+                .accessibilityLabel(localized("updateLayout"))
             }
         }
     }
+    
+    // MARK: - ShowsListViewing
+    
+    var listener: ShowsListViewingListening?
+    
+    func update(loading: Bool) {
+        viewModel.loading = loading
+    }
+    
+    func update(shows: [Show]) {
+        viewModel.shows = shows
+    }
+    
+    func update(title: String) {
+        viewModel.title = title
+    }
+    
+    func update(loadingNewPage: Bool) {
+        viewModel.isPaginating = loadingNewPage
+    }
+    
+    // MARK: - Private
+    
+    @ObservedObject private var viewModel: ShowsListViewModel
+    @State private var didLoad: Bool = false
+    @State private var layout: LayoutMode = .list
+    
+    private let showViewProvider: ShowViewProviding
+    private let gridColumns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
     
     private var loadingView: some View {
         VStack {
@@ -123,7 +101,11 @@ struct ShowsListView: View {
             Text(localized("genericError"))
             Text(localized("tryAgain"))
             Spacer()
-            Button(action: { listener?.didPressRetryButton() }) {
+            Button(
+                action: {
+                    listener?.didPressRetryButton()
+                }
+            ) {
                 Text(localized("retry"))
             }
             Spacer()
@@ -137,9 +119,9 @@ struct ShowsListView: View {
     }
     
     private var listView: some View {
-        List {
+        return List {
             ForEach(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
-                ShowView(viewModel: showViewModelFactory.build(show: show))
+                showViewProvider.view(for: show, isGridLayout: false)
                     .onTapGesture {
                         listener?.didSelect(show: show)
                     }
@@ -167,7 +149,7 @@ struct ShowsListView: View {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: 12) {
                 ForEach(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
-                    ShowView(viewModel: showViewModelFactory.build(show: show), grid: true)
+                    showViewProvider.view(for: show, isGridLayout: true)
                         .onTapGesture {
                             listener?.didSelect(show: show)
                         }
@@ -193,29 +175,38 @@ struct ShowsListView: View {
             .scrollIndicators(.hidden)
         }
     }
-}
-
-extension ShowsListView: @preconcurrency ShowsListPresenting {
-    
-    func showLoading() {
-        viewModel.loading = true
-    }
-    
-    func hideLoading() {
-        viewModel.loading = false
-    }
-    
-    func update(list: [Show]) {
-        viewModel.shows = list
-    }
-    
-    func update(title: String) {
-        viewModel.title = title
-    }
-    
-    func update(loadingNewPage value: Bool) {
-        viewModel.isPaginating = value
-    }
     
 }
 
+// MARK: - Helpers
+
+fileprivate final class ShowsListViewModel: ObservableObject {
+    @Published var title: String
+    @Published var shows: [Show]
+    @Published var loading: Bool
+    @Published var isPaginating: Bool
+    
+    init(
+        title: String = "",
+        shows: [Show] = [],
+        loading: Bool = false,
+        isPaginating: Bool = false
+    ) {
+        self.title = title
+        self.shows = shows
+        self.loading = loading
+        self.isPaginating = isPaginating
+    }
+}
+
+fileprivate enum LayoutMode: String, CaseIterable, Identifiable {
+    case list = "Lista"
+    case grid = "Grid"
+    var id: String { rawValue }
+    var icon: String {
+        switch self {
+        case .list: return "list.bullet"
+        case .grid: return "square.grid.2x2"
+        }
+    }
+}
