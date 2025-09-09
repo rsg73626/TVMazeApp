@@ -14,11 +14,6 @@ struct ShowDetailsView: View {
     
     var listener: ShowDetailsPresentingListener?
     
-    @ObservedObject private var viewModel = ShowDetailsViewModel()
-    @State private var didLoad: Bool = false
-    
-    private let padding: CGFloat = 16
-    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
@@ -81,12 +76,19 @@ struct ShowDetailsView: View {
         }
     }
     
+    // MARK: - Private
+    
+    @ObservedObject private var viewModel = ShowDetailsViewModel()
+    @State private var didLoad: Bool = false
+    
+    private let padding: CGFloat = 16
+    
 }
 
-extension ShowDetailsView: @preconcurrency ShowDetailsPresenting {
+extension ShowDetailsView: @preconcurrency ShowDetailsViewing {
     
-    func update(image: ImageState) {
-        viewModel.image = image
+    func update(imageState: ImageState) {
+        viewModel.image = imageState
     }
     
     func update(title: String) {
@@ -116,4 +118,5 @@ extension AttributedString {
         }
         return copy
     }
+    
 }

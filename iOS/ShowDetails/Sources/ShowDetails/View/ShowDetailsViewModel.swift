@@ -10,13 +10,6 @@ import Domain
 import Foundation
 import SwiftUI
 
-enum ImageState: Equatable {
-    case loading
-    case image(UIImage)
-    
-    var isLoading: Bool { self == .loading }
-}
-
 final class ShowDetailsViewModel: ObservableObject, Identifiable {
     let id: UUID
     @Published var image: ImageState

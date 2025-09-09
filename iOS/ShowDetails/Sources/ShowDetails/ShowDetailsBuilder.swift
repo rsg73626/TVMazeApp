@@ -24,14 +24,16 @@ public final class ShowDetailsBuilder: @preconcurrency ShowDetailsBuilding {
             imageService: dependencies.imageService,
             dataFetcher: dependencies.dataFetcher
         )
+        let presenter = ShowDetailsPresenter()
         let interactor = ShowDetailsInteractor(
+            presenter: presenter,
             show: show,
             showsService: dependencies.showsService,
             imageLoader: imageLoader
         )
         var view = ShowDetailsView()
         view.listener = interactor
-        interactor.presenter = view
+        presenter.view = view
         return UIHostingController(rootView: view)
     }
 
