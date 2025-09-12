@@ -25,7 +25,7 @@ public final class ShowsListBuilder: @preconcurrency ShowsListBuilding {
         let interactor = ShowsListInteractor(
             presenter: presenter,
             router: router,
-            showsService: dependencies.showsService
+            showsProvider: dependencies.showsProvider
         )
         var view = ShowsListView(showViewProvider: presenter)
         
@@ -40,7 +40,7 @@ public final class ShowsListBuilder: @preconcurrency ShowsListBuilding {
     // MARK: - Private
     
     private func imageLoader() -> ImageLoading {
-        ImageLoader(dataFetcher: dependencies.dataFetcher)
+        ImageLoader(dataProvider: dependencies.dataProvider)
     }
 
 }

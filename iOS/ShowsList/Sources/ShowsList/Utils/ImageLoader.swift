@@ -7,7 +7,7 @@
 
 import Combine
 import Domain
-import ServiceAPI
+import ShowsListAPI
 import UIKit
 
 protocol ImageLoading {
@@ -17,14 +17,14 @@ protocol ImageLoading {
 final class ImageLoader: ImageLoading {
     
     var dataToImage: (Data) -> UIImage? = UIImage.init
-    let dataFetcher: DataFetching
+    let dataProvider: DataProviding
     let defaultPlaceholder: UIImage
     
     init(
-        dataFetcher: DataFetching,
+        dataProvider: DataProviding,
         defaultPlaceholder: UIImage = .placeholder
     ) {
-        self.dataFetcher = dataFetcher
+        self.dataProvider = dataProvider
         self.defaultPlaceholder = defaultPlaceholder
     }
     
@@ -58,8 +58,8 @@ final class ImageLoader: ImageLoading {
             return Just(cachedImage)
                 .eraseToAnyPublisher()
         }
-        return dataFetcher
-            .fetchData(for: url)
+        return dataProvider
+            .data(for: url)
             .map { [weak self] data in
                 if let image = self?.dataToImage(data) {
                     self?.inMemoryCache[url] = image

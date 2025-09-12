@@ -2,15 +2,14 @@
 import Combine
 import Domain
 @testable import ShowsList
-import ServiceAPI
-import ServiceAPIMocks
+import ShowsListAPI
 import XCTest
 
 final class ShowsListInteractorTests: XCTestCase {
     
     private var presenter: ShowsListPresentingMock!
     private var router: ShowsListRoutingMock!
-    private var service: ShowsServicingMock!
+    private var provider: ShowsProvidingMock!
     private var interactor: ShowsListInteractor!
     
     override func setUp() {
@@ -18,14 +17,14 @@ final class ShowsListInteractorTests: XCTestCase {
         
         presenter = ShowsListPresentingMock()
         router = ShowsListRoutingMock()
-        service = ShowsServicingMock()
+        provider = ShowsProvidingMock()
         interactor = ShowsListInteractor(
             presenter: presenter,
             router: router,
-            showsService: service
+            showsProvider: provider
         )
         
-        service.showsHandler = { _ in
+        provider.showsHandler = { _ in
             Just(ShowsResult.didFinish)
                 .setFailureType(to: Error.self)
                 .eraseToAnyPublisher()
@@ -46,13 +45,13 @@ final class ShowsListInteractorTests: XCTestCase {
     
     func test_viewDidLoad_callsService_shows() {
         // given
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         
         // when
         interactor.viewDidLoad()
         
         // verify
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
     }
     
     func test_viewDidLoad_serviceFailure_hidesLoading() {
@@ -71,7 +70,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         wait(for: [exp], timeout: 1)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         XCTAssertEqual(2, presenter.updateLoadingCallCount)
     }
     
@@ -91,7 +90,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         wait(for: [exp], timeout: 1)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         XCTAssertEqual(2, presenter.updateLoadingCallCount)
     }
     
@@ -111,7 +110,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         wait(for: [exp], timeout: 1)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         XCTAssertEqual(2, presenter.updateLoadingCallCount)
     }
     
@@ -130,7 +129,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         wait(for: [exp], timeout: 1)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         XCTAssertEqual(1, presenter.updateShowsCallCount)
     }
     
@@ -149,7 +148,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         wait(for: [exp], timeout: 1)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         XCTAssertEqual(1, presenter.updateShowsCallCount)
     }
     
@@ -169,7 +168,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         wait(for: [exp], timeout: 1)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         XCTAssertEqual(1, presenter.updateShowsCallCount)
     }
     
@@ -191,14 +190,14 @@ final class ShowsListInteractorTests: XCTestCase {
     func test_retry_showsLoading_callsService() {
         // given
         presenter.updateLoadingCallCount = 0
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         
         // when
         interactor.didPressRetryButton()
         
         // verify
         XCTAssertEqual(1, presenter.updateLoadingCallCount)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
     }
     
     // MARK: - Pagination tests
@@ -207,7 +206,7 @@ final class ShowsListInteractorTests: XCTestCase {
         // given
         firstDataFetch(count: 3)
         presenter.updateLoadingNewPageCallCount = 0
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         
         // when
         interactor.didShowItemAt(index: 0)
@@ -215,7 +214,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         XCTAssertEqual(0, presenter.updateLoadingNewPageCallCount)
-        XCTAssertEqual(0, service.showsCallCount)
+        XCTAssertEqual(0, provider.showsCallCount)
     }
     
     func test_didShowItemAt_lastIndex_paginate() {
@@ -228,7 +227,7 @@ final class ShowsListInteractorTests: XCTestCase {
             XCTAssertEqual(firstPage + newPage, receivedShows)
             exp.fulfill()
         }
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         presenter.updateLoadingNewPageCallCount = 0
         
         // when
@@ -236,7 +235,7 @@ final class ShowsListInteractorTests: XCTestCase {
         
         // verify
         XCTAssertEqual(1, presenter.updateLoadingNewPageCallCount)
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         wait(for: [exp], timeout: 1)
     }
     
@@ -256,7 +255,7 @@ final class ShowsListInteractorTests: XCTestCase {
         let currentList = firstPage + secondPage
         // setting service error -> will fail next pagination
         service_shows_error(expectedPage: 2)
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         let showNewPageLoadingExp = expectation(description: "show new page loading")
         let hideNewPageLoadingExp = expectation(description: "hide new page loading")
         presenter.updateLoadingNewPageHandler = { receivedValue in
@@ -271,15 +270,15 @@ final class ShowsListInteractorTests: XCTestCase {
         // displaying last item from list -> trigger pagination
         interactor.didShowItemAt(index: currentList.count - 1)
         // did reach service -> error -> finish paginating
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         wait(for: [showNewPageLoadingExp, hideNewPageLoadingExp], timeout: 1)
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         presenter.updateLoadingNewPageCallCount = 0
         // try paginating again
         interactor.didShowItemAt(index: currentList.count - 1)
         
         // verify
-        XCTAssertEqual(0, service.showsCallCount)
+        XCTAssertEqual(0, provider.showsCallCount)
         XCTAssertEqual(0, presenter.updateLoadingNewPageCallCount)
     }
     
@@ -290,7 +289,7 @@ final class ShowsListInteractorTests: XCTestCase {
         let currentList = firstPage + secondPage
         // setting service ending pagination -> will fail next pagination
         service_shows_success(result: .didFinish, expectedPage: 2)
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         let showNewPageLoadingExp = expectation(description: "show new page loading")
         let hideNewPageLoadingExp = expectation(description: "hide new page loading")
         presenter.updateLoadingNewPageHandler = { receivedValue in
@@ -305,15 +304,15 @@ final class ShowsListInteractorTests: XCTestCase {
         // displaying last item from list -> trigger pagination
         interactor.didShowItemAt(index: currentList.count - 1)
         // did reach service -> error -> finish paginating
-        XCTAssertEqual(1, service.showsCallCount)
+        XCTAssertEqual(1, provider.showsCallCount)
         wait(for: [showNewPageLoadingExp, hideNewPageLoadingExp], timeout: 1)
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         presenter.updateLoadingNewPageCallCount = 0
         // try paginating again
         interactor.didShowItemAt(index: currentList.count - 1)
         
         // verify
-        XCTAssertEqual(0, service.showsCallCount)
+        XCTAssertEqual(0, provider.showsCallCount)
         XCTAssertEqual(0, presenter.updateLoadingNewPageCallCount)
     }
     
@@ -339,14 +338,14 @@ final class ShowsListInteractorTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        service.showsHandler = { receivedPage in
+        provider.showsHandler = { receivedPage in
             XCTAssertEqual(expectedPage, receivedPage, file: file, line: line)
             return Fail(
                 outputType: ShowsResult.self,
                 failure: error
             ).eraseToAnyPublisher()
         }
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
     }
     
     private func service_shows_success(
@@ -355,13 +354,13 @@ final class ShowsListInteractorTests: XCTestCase {
         file: StaticString = #filePath,
         line: UInt = #line
     ) {
-        service.showsHandler = { receivedPage in
+        provider.showsHandler = { receivedPage in
             XCTAssertEqual(expectedPage, receivedPage, file: file, line: line)
             return Just(result)
                 .setFailureType(to: Error.self)
                 .eraseToAnyPublisher()
         }
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
     }
     
     @discardableResult
@@ -418,7 +417,7 @@ final class ShowsListInteractorTests: XCTestCase {
             XCTAssertEqual(currentList + newPage, receivedShows, file: file, line: line)
             exp.fulfill()
         }
-        service.showsCallCount = 0
+        provider.showsCallCount = 0
         presenter.updateLoadingNewPageCallCount = 0
         
         // when
@@ -434,7 +433,7 @@ final class ShowsListInteractorTests: XCTestCase {
         )
         XCTAssertEqual(
             1,
-            service.showsCallCount,
+            provider.showsCallCount,
             "showsCallCount",
             file: file,
             line: line
