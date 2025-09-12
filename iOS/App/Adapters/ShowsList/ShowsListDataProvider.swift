@@ -21,7 +21,7 @@ final class ShowsListDataProvider: ShowsListAPI.DataProviding {
     func data(for url: URL) -> AnyPublisher<Data, any Error> {
         dataFetcher
             .fetchData(for: url)
-            .eraseToAnyPublisher()g
+            .eraseToAnyPublisher()
     }
     
     // MARK: - Private
