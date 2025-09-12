@@ -75,24 +75,18 @@ The modules depends on each other on the following way:
   - LocalAPI
 - ShowsListAPI
   - Domain
-  - ServiceAPI
   - ShowsDetailsAPI
 - ShowsList
   - Domain
-  - ServiceAPI
   - ShowsDetailsAPI
   - ShowsListAPI
 - ShowDetailsAPI
   - Domain
-  - ServiceAPI
 - ShowsDetails
   - Domain
-  - ServiceAPI
   - ShowDetailsAPI
 - App
   - ALL MODULES
-
-This architecture could be improved by updating the feature modules (list and details) to declare their own service interface, instead of depending directly to the service module, leaving them more independent of each other. They could be connect thorough the integration module `App`.
 
 The retry policy and the caching logic is implemented on the App module. It uses some adapters to connect the instance of service and local implementations. 
 
@@ -102,22 +96,20 @@ The integration module also does the injection of dependencies necessary by the 
 
 For each screen (list and details) the VIPER architecture was used.
 
-**View**: user interface; handles layout logic; receives interactions from the user and passes it to interfactor through the presenter
-**Interactor**: interacts with data layer (service); handle business logic; calls presenter to display content; interacts with router for navigation.
-**Presenter**: invokes view to display data; receives interactions from the view and passed to the interactor.
-**Entity**: represent the data of the application, in this case, the shows and images.
-**Router**: handles navigation
+**View**: user interface; handles layout logic; receives interactions from the user and passes it to interfactor via listener.
+**Interactor**: interacts with data data providers; handle business logic; calls presenter to display content; interacts with router for navigation; handles user interaction events from UI.
+**Presenter**: receives the data from the interactor and transforms it to be displayed in the view.
+**Entity**: basic objects of the app.
+**Router**: handles navigation.
 
 I also used **ViewModel** objects to help display content, with special attention to the image download of each cell in the list. In this case the ViewModel can be seen as an extension of the interactor. 
 
 ## Improvements
 
  - Increase code coverage with unit and ui tests.
- - Decouple feature modules from service.
- - Standardize presentation architecture (it's not following VIPER 100%).
  - Add a DI framework so the application can be better mainteined.
- - Increment details to fetch and display episodes.
- - Install swift lint.
+ - Implement `Episodes` feature.
+ - Install Swift Lint.
 
 ## Usage of the API
 
@@ -150,7 +142,8 @@ The API from the TVMaze website exposes two sets of endpoints: public and restri
  - If no main image is available, the first poster image will be used
  - If no main or poster image is available, a local placeholder will be used.
 
-### Pre fetch policy (pagination)
+### Pagination
+
  - In order to provide a better user experience, the app won’t wait for the user to reach the end of the list of shows to fetch more data. More data must be fetched before the user reaches the end of the list.
  - This must be done in the background, without blocking the UI.
 
@@ -158,16 +151,14 @@ The API from the TVMaze website exposes two sets of endpoints: public and restri
 
 In order to provide a better user experience, data must be stored locally after being fetched from the API, and the next time the user accesses the same content, the local data will be used instead of calling the API again, preventing the user from seeing the loading screen and displaying information immediately. 
 All the data for the first one thousand items will be stored locally. This includes: shows, episodes and images. Since each page contains 250 items, the first four pages will be stored. The following rules must be followed:
-Time to Live (TTL): 15 minutes.
-When to store: right after fetching it from the API.
-When to delete: when opening the app and trying to fetch the first page; if local data is out of TTL, delete it, reach the internet to fetch data again and store it again.
-When to renew TTL: if the user reopens the app within a valid time range; for instance, if the user reopens the app after 5 minutes, the local data will be available for more 10 minutes, but it will be renewed to be valid for more 15 minutes. 
-When don’t delete: when the user accesses the app without internet connection. In this case, show local data and a warning that data may be outdated. 
-When don’t delete (II): when the API is not available. In this case, show local data and a warning that data may be outdated. 
+ - **Time to Live (TTL)**: 15 minutes.
+ - **When to store**: right after fetching it from the API.
+ - **When to delete**: when opening the app and trying to fetch the first page; if local data is out of TTL, delete it, reach the internet to fetch data again and store it again.
+ - **When to renew TTL**: if the user reopens the app within a valid time range; for instance, if the user reopens the app after 5 minutes, the local data will be available for more 10 minutes, but it will be renewed to be valid for more 15 minutes. 
+ - **When don’t delete**: when the user accesses the app without internet connection. In this case, show local data and a warning that data may be outdated. 
+ - **When don’t delete (II)**: when the API is not available. In this case, show local data and a warning that data may be outdated. 
 
 After the fourth page, the downloaded data will be available only in-memory. 
-
-Since the number of items per page can be changed in the future of the API, the caching logic must take into consideration only the index of the item for which the data is being downloaded. 
 
 ### Retry policy
 
@@ -186,22 +177,5 @@ If it’s not possible to fetch any data for any reason an error screen with a m
 If it’s not possible to download an image a placeholder must be used.
 
 Attention: there are some cases when an image might not be available but there is another option available. The placeholder must be used only in case none of the alternatives could be downloaded. 
-
-Loading state
-The app must show a loading while data is being fetched. 
-Technical requirements
-Reactive programming 
-Dependency Injection
-VIPER architecture
-SOLID principles
-Clean architecture principles
-Swift Lint
-Unit test coverage
-Simple CI script
-Tech Stack
-Combine
-Swift UI
-Needle (manual)
-CoreData
 
 
