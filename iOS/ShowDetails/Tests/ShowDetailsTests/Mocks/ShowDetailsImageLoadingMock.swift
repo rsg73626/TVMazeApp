@@ -10,7 +10,7 @@ import Domain
 @testable import ShowDetails
 import UIKit
 
-final class ShowDetailsImageLoadingMock: ShowDetailsImageLoading {
+final class ImageLoadingMock: ImageLoading {
     
     var imageCallCount = 0
     
