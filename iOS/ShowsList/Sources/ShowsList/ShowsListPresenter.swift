@@ -8,8 +8,8 @@
 import Domain
 import SwiftUI
 
-@MainActor final class ShowsListPresenter: @preconcurrency ShowsListPresenting,
-                                           @preconcurrency ShowViewProviding {
+final class ShowsListPresenter: ShowsListPresenting,
+                                ShowViewProviding {
     
     var view: ShowsListViewing?
     
@@ -40,8 +40,8 @@ import SwiftUI
     }
     
     // MARK: - ShowViewProviding
-    
-    func view(for show: Show, isGridLayout: Bool) -> ShowView {
+    @MainActor
+    func showView(for show: Show, isGridLayout: Bool) -> ShowView {
         ShowView(
             viewModel: ShowViewModel(
                 show: show,

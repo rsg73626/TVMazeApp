@@ -5,24 +5,29 @@
 //  Created by Renan Germano on 04/09/25.
 //
 
+import Combine
 import Domain
-import ServiceAPI
 import UIKit
+
+public protocol DataProviding {
+    func fetchData(for url: URL) -> AnyPublisher<Data, Error>
+}
+
+public protocol ImageProviding {
+    func images(showId: Int) -> AnyPublisher<[Image], Error>
+}
 
 public struct ShowDetailsDependencies {
     
-    public let dataFetcher: DataFetching
-    public let imageService: ImageServicing
-    public let showsService: ShowsServicing
+    public let dataProvider: DataProviding
+    public let imageProvider: ImageProviding
     
     public init(
-        dataFetcher: DataFetching,
-        imageService: ImageServicing,
-        showsService: ShowsServicing
+        dataProvider: DataProviding,
+        imageProvider: ImageProviding
     ) {
-        self.dataFetcher = dataFetcher
-        self.imageService = imageService
-        self.showsService = showsService
+        self.dataProvider = dataProvider
+        self.imageProvider = imageProvider
     }
 }
 

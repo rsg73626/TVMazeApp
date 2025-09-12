@@ -1,26 +1,25 @@
 //
 //  File.swift
-//  ShowDetails
+//  ShowsList
 //
-//  Created by Renan Germano on 05/09/25.
+//  Created by Renan Germano on 11/09/25.
 //
 
-import Combine
 import Domain
-@testable import ShowDetails
-import UIKit
+import Combine
+@testable import ShowsList
+import SwiftUI
 
-final class ImageLoadingMock: ImageLoading {
+final class ShowsListImageLoadingMock: ImageLoading {
     
     var imageCallCount = 0
     
     var imageHandler: ((Show) -> AnyPublisher<UIImage, Never>)?
     
-    // MARK: - ShowDetailsImageLoading
+    // MARK: - ShowsListImageLoadingMock
     
     func image(for show: Show) -> AnyPublisher<UIImage, Never> {
         imageCallCount += 1
-        
         return unwrapHandler(imageHandler)(show)
     }
     

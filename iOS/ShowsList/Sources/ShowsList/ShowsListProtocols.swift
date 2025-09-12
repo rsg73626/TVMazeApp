@@ -36,5 +36,5 @@ protocol ShowsListViewingListening: AnyObject {
 }
 
 protocol ShowViewProviding {
-    func view(for show: Show, isGridLayout: Bool) -> ShowView
+    @MainActor func showView(for show: Show, isGridLayout: Bool) -> ShowView
 }

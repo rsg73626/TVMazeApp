@@ -7,7 +7,6 @@
 
 import Domain
 import Combine
-import ServiceAPI
 import SwiftUI
 import ShowsListAPI
 
@@ -121,7 +120,7 @@ struct ShowsListView: View, @preconcurrency ShowsListViewing {
     private var listView: some View {
         return List {
             ForEach(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
-                showViewProvider.view(for: show, isGridLayout: false)
+                showViewProvider.showView(for: show, isGridLayout: false)
                     .onTapGesture {
                         listener?.didSelect(show: show)
                     }
@@ -149,7 +148,7 @@ struct ShowsListView: View, @preconcurrency ShowsListViewing {
         ScrollView {
             LazyVGrid(columns: gridColumns, spacing: 12) {
                 ForEach(Array(viewModel.shows.enumerated()), id: \.offset) { index, show in
-                    showViewProvider.view(for: show, isGridLayout: true)
+                    showViewProvider.showView(for: show, isGridLayout: true)
                         .onTapGesture {
                             listener?.didSelect(show: show)
                         }

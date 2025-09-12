@@ -5,22 +5,37 @@
 //  Created by Renan Germano on 30/08/25.
 //
 
+import Combine
 import Domain
-import ServiceAPI
 import ShowDetailsAPI
 import UIKit
 
+public enum ShowsResult {
+    case shows([Show])
+    case didFinish
+}
+
+public protocol ShowsProviding {
+    func shows(page: UInt) -> AnyPublisher<ShowsResult, Error>
+}
+
+public protocol DataProviding {
+    func data(for url: URL) -> AnyPublisher<Data, Error>
+}
+
 public struct ShowsListDependencies {
     
-    public let dataFetcher: DataFetching
-    public let imageService: ImageServicing
-    public let showsService: ShowsServicing
+    public let showsProvider: ShowsProviding
+    public let dataProvider: DataProviding
     public let showDetailsBuilder: ShowDetailsBuilding
     
-    public init(dataFetcher: DataFetching, imageService: ImageServicing, showsService: ShowsServicing, showDetailsBuilder: ShowDetailsBuilding) {
-        self.dataFetcher = dataFetcher
-        self.imageService = imageService
-        self.showsService = showsService
+    public init(
+        showsProvider: ShowsProviding,
+        dataProvider: DataProviding,
+        showDetailsBuilder: ShowDetailsBuilding
+    ) {
+        self.showsProvider = showsProvider
+        self.dataProvider = dataProvider
         self.showDetailsBuilder = showDetailsBuilder
     }
 }

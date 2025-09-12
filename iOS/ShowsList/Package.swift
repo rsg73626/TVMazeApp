@@ -15,7 +15,6 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../Domain"),
-        .package(path: "../Service"),
         .package(path: "../ShowDetails"),
     ],
     targets: [
@@ -23,7 +22,6 @@ let package = Package(
             name: "ShowsListAPI",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
-                .product(name: "ServiceAPI", package: "Service"),
                 .product(name: "ShowDetailsAPI", package: "ShowDetails")
             ]
         ),
@@ -31,8 +29,6 @@ let package = Package(
             name: "ShowsList",
             dependencies: [
                 .product(name: "Domain", package: "Domain"),
-                .product(name: "ServiceAPI", package: "Service"),
-                .product(name: "ShowDetails", package: "ShowDetails"),
                 .product(name: "ShowDetailsAPI", package: "ShowDetails"),
                 "ShowsListAPI"
             ],
@@ -43,9 +39,7 @@ let package = Package(
         .testTarget(
             name: "ShowsListTests",
             dependencies: [
-                "ShowsList",
-                .product(name: "ServiceAPI", package: "Service"),
-                .product(name: "ServiceAPIMocks", package: "Service")
+                "ShowsList"
             ]
         ),
     ]

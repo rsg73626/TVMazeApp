@@ -20,15 +20,14 @@ public final class ShowDetailsBuilder: @preconcurrency ShowDetailsBuilding {
     }
     
     @MainActor public func build(show: Show) -> UIViewController {
-        let imageLoader = ShowDetailsImageLoader(
-            imageService: dependencies.imageService,
-            dataFetcher: dependencies.dataFetcher
+        let imageLoader = ImageLoader(
+            imageProvider: dependencies.imageProvider,
+            dataProvider: dependencies.dataProvider
         )
         let presenter = ShowDetailsPresenter()
         let interactor = ShowDetailsInteractor(
             presenter: presenter,
             show: show,
-            showsService: dependencies.showsService,
             imageLoader: imageLoader
         )
         var view = ShowDetailsView()
