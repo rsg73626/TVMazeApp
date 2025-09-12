@@ -70,11 +70,18 @@ final class DI {
         return ShowDetailsBuilder(dependencies: dependencies)
     }()
     
+    private static var showsListShowsProvider: ShowsListAPI.ShowsProviding = {
+        ShowsListShowsProvider(service: showsService)
+    }()
+    
+    private static var showsListDataProvider: ShowsListAPI.DataProviding = {
+        ShowsListDataProvider(dataFetcher: dataFetcher)
+    }()
+    
     static var showsListBuilder: ShowsListBuilding = {
         let dependencies = ShowsListDependencies(
-            dataFetcher: dataFetcher,
-            imageService: imageService,
-            showsService: showsService,
+            showsProvider: showsListShowsProvider,
+            dataProvider: showsListDataProvider,
             showDetailsBuilder: showDetailsBuilder
         )
         return ShowsListBuilder(dependencies: dependencies)

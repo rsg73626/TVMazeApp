@@ -29,7 +29,7 @@ public struct ShowsListDependencies {
     public let dataProvider: DataProviding
     public let showDetailsBuilder: ShowDetailsBuilding
     
-    init(
+    public init(
         showsProvider: ShowsProviding,
         dataProvider: DataProviding,
         showDetailsBuilder: ShowDetailsBuilding
