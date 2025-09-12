@@ -4,16 +4,13 @@ import Domain
 import Foundation
 @testable import ShowDetails
 import ShowDetailsAPI
-import ServiceAPI
-import ServiceAPIMocks
 import UIKit
 import XCTest
 
 final class ShowDetailsTests: XCTestCase {
     
     private var presenter: ShowDetailsPresentingMock!
-    private var service: ShowsServicingMock!
-    private var imageLoader: ShowDetailsImageLoadingMock!
+    private var imageLoader: ImageLoadingMock!
     private var aShow: Show!
     private var interactor: ShowDetailsInteractor!
     
@@ -21,13 +18,11 @@ final class ShowDetailsTests: XCTestCase {
         super.setUp()
         
         presenter = ShowDetailsPresentingMock()
-        service = ShowsServicingMock()
-        imageLoader = ShowDetailsImageLoadingMock()
+        imageLoader = ImageLoadingMock()
         aShow = show()
         interactor = ShowDetailsInteractor(
             presenter: presenter,
             show: aShow,
-            showsService: service,
             imageLoader: imageLoader
         )
         interactor.presenter = presenter
@@ -140,7 +135,6 @@ final class ShowDetailsTests: XCTestCase {
         interactor = ShowDetailsInteractor(
             presenter: presenter,
             show: aShow,
-            showsService: service,
             imageLoader: imageLoader
         )
         interactor.presenter = presenter

@@ -1,27 +1,27 @@
 //
 //  File.swift
-//  ShowDetails
+//  ShowsList
 //
-//  Created by Renan Germano on 05/09/25.
+//  Created by Renan Germano on 12/09/25.
 //
 
 import Combine
 import Domain
-@testable import ShowDetails
-import UIKit
+import Foundation
+import ShowsListAPI
 
-final class ImageLoadingMock: ImageLoading {
+final class DataProvidingMock: DataProviding {
     
-    var imageCallCount = 0
+    var dataCallCount = 0
     
-    var imageHandler: ((Show) -> AnyPublisher<UIImage, Never>)?
+    var dataHandler: ((URL) -> AnyPublisher<Data, Error>)?
     
-    // MARK: - ShowDetailsImageLoading
+    // MARK: - DataProviding
     
-    func image(for show: Show) -> AnyPublisher<UIImage, Never> {
-        imageCallCount += 1
+    func data(for url: URL) -> AnyPublisher<Data, any Error> {
+        dataCallCount += 1
         
-        return unwrapHandler(imageHandler)(show)
+        return unwrapHandler(dataHandler)(url)
     }
     
     // MARK: - Private
@@ -36,6 +36,5 @@ final class ImageLoadingMock: ImageLoading {
         }
         return handler
     }
-    
     
 }

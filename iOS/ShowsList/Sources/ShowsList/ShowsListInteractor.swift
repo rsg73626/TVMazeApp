@@ -8,23 +8,22 @@
 import Combine
 import Domain
 import Foundation
-import ServiceAPI
 import ShowsListAPI
 
 final class ShowsListInteractor: ShowsListViewingListening {
     
     let presenter: ShowsListPresenting
     let router: ShowsListRouting
-    let showsService: ShowsServicing
+    let showsProvider: ShowsProviding
     
     init(
         presenter: ShowsListPresenting,
         router: ShowsListRouting,
-        showsService: ShowsServicing
+        showsProvider: ShowsProviding
     ) {
         self.presenter = presenter
         self.router = router
-        self.showsService = showsService
+        self.showsProvider = showsProvider
     }
     
     // MARK: - ShowsListViewingListening
@@ -59,7 +58,7 @@ final class ShowsListInteractor: ShowsListViewingListening {
     private func fetchData() {
         cancelCurrentSubscriptions()
         presenter.update(loading: true)
-        showsService
+        showsProvider
             .shows(page: .zero)
             .receive(on: DispatchQueue.main)
             .sink(
@@ -97,7 +96,7 @@ final class ShowsListInteractor: ShowsListViewingListening {
         presenter.update(loadingNewPage: true)
         cancelCurrentSubscriptions()
         let nextPage = currentPage + 1
-        showsService
+        showsProvider
             .shows(page: nextPage)
             .receive(on: DispatchQueue.main)
             .first()

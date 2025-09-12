@@ -7,30 +7,27 @@
 
 import Combine
 import Domain
-import ServiceAPI
+import ShowDetailsAPI
 import UIKit
 
-protocol ShowDetailsImageLoading {
+protocol ImageLoading {
     func image(for show: Show) -> AnyPublisher<UIImage, Never>
 }
 
-final class ShowDetailsImageLoader: ShowDetailsImageLoading {
+final class ImageLoader: ImageLoading {
     
-    let imageService: ImageServicing
-    let dataFetcher: DataFetching
+    let imageProvider: ImageProviding
+    let dataProvider: DataProviding
     
-    init(
-        imageService: ImageServicing,
-        dataFetcher: DataFetching
-    ) {
-        self.imageService = imageService
-        self.dataFetcher = dataFetcher
+    init(imageProvider: ImageProviding, dataProvider: DataProviding) {
+        self.imageProvider = imageProvider
+        self.dataProvider = dataProvider
     }
     
     // MARK: - ShowDetailsImageLoading
     
     func image(for show: Show) -> AnyPublisher<UIImage, Never> {
-        return imageService
+        return imageProvider
             .images(showId: show.id)
             .replaceError(with: [])
             .map { images -> (mainPoster: URL?, poster: URL?) in
@@ -59,7 +56,7 @@ final class ShowDetailsImageLoader: ShowDetailsImageLoading {
         _ url: URL,
         onFailure: AnyPublisher<UIImage, Never>
     ) -> AnyPublisher<UIImage, Never> {
-        dataFetcher
+        dataProvider
             .fetchData(for: url)
             .map { data in
                 if let image = UIImage(data: data) {

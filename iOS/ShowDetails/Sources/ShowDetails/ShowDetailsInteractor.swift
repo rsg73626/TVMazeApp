@@ -4,25 +4,21 @@
 import Combine
 import Domain
 import Foundation
-import ServiceAPI
 import UIKit
 
 final class ShowDetailsInteractor: ShowDetailsPresentingListener {
     
     var presenter: ShowDetailsPresenting
     let show: Show
-    let showsService: ShowsServicing
-    let imageLoader: ShowDetailsImageLoading
+    let imageLoader: ImageLoading
     
     init(
         presenter: ShowDetailsPresenting,
         show: Show,
-        showsService: ShowsServicing,
-        imageLoader: ShowDetailsImageLoading
+        imageLoader: ImageLoading
     ) {
         self.presenter = presenter
         self.show = show
-        self.showsService = showsService
         self.imageLoader = imageLoader
     }
     

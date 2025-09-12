@@ -7,7 +7,6 @@
 
 import Domain
 import Combine
-import ServiceAPI
 import SwiftUI
 import ShowsListAPI
 
